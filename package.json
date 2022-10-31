@@ -1,0 +1,48 @@
+{
+	"name": "rspell",
+	"version": "0.0.1",
+	"description": "Efficiently spellcheck an entire project with a single command!",
+	"main": "dist/cli.js",
+	"repository": "https://github.com/Lioness100/rspell",
+	"author": "Lioness100",
+	"license": "Apache-2.0",
+	"type": "module",
+	"bin": "dist/cli.js",
+	"scripts": {
+		"lint": "eslint src --ext ts --fix",
+		"format": "prettier --write \"src/**/*.ts\"",
+		"update": "yarn upgrade-interactive",
+		"build": "tsup",
+		"watch": "tsup --watch",
+		"typecheck": "tsc -b src"
+	},
+	"dependencies": {
+		"chalk": "^5.0.1",
+		"commander": "^9.4.0",
+		"cspell": "^6.8.0",
+		"inquirer": "^9.1.4",
+		"inquirer-prompt-suggest": "^0.1.0",
+		"ora": "^6.1.2"
+	},
+	"devDependencies": {
+		"@sapphire/eslint-config": "^4.3.8",
+		"@sapphire/prettier-config": "^1.4.4",
+		"@sapphire/ts-config": "^3.3.4",
+		"@types/inquirer": "^9",
+		"@types/node": "^17.0.38",
+		"@typescript-eslint/eslint-plugin": "^5.41.0",
+		"@typescript-eslint/parser": "^5.41.0",
+		"eslint": "^8.16.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-prettier": "^4.2.1",
+		"eslint-plugin-unicorn": "^44.0.2",
+		"prettier": "^2.6.2",
+		"tsup": "^6.0.1",
+		"typescript": "^4.7.2"
+	},
+	"engines": {
+		"node": ">=16.6"
+	},
+	"prettier": "@sapphire/prettier-config",
+	"packageManager": "yarn@3.2.1"
+}

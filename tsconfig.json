@@ -1,0 +1,11 @@
+{
+	"extends": "@sapphire/ts-config/extra-strict",
+	"compilerOptions": {
+		"outDir": "dist",
+		"baseUrl": "src",
+		"noEmit": true,
+		"target": "ESNext",
+		"module": "ESNext",
+		"noImplicitReturns": false
+	}
+}

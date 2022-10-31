@@ -1,0 +1,9 @@
+{
+	"extends": ["@sapphire", "plugin:unicorn/recommended"],
+	"rules": {
+		"curly": "error",
+		"unicorn/no-nested-ternary": "off",
+		"unicorn/filename-case": ["error", { "case": "camelCase" }],
+		"unicorn/explicit-length-check": "off"
+	}
+}

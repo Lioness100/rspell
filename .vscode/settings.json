@@ -1,0 +1,17 @@
+{
+	"eslint.validate": ["typescript"],
+	"editor.tabSize": 4,
+	"editor.useTabStops": true,
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"search.exclude": {
+		"**/node_modules": true,
+		"**/dist/": true,
+		"**/.git/": true
+	},
+	"editor.codeActionsOnSave": {
+		"source.fixAll": true
+	},
+	"editor.wordWrapColumn": 120,
+	"rewrap.autoWrap.enabled": true
+}

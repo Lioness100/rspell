@@ -1,0 +1,58 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  Linting:
+    name: Linting
+    runs-on: ubuntu-latest
+    if: "!contains(needs.pre_ci.outputs.commit_message, '[skip ci]')"
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
+      - name: Add problem matcher
+        run: echo "::add-matcher::.github/problemMatchers/eslint.json"
+      - name: Use Node.js v16
+        uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # tag=v3
+        with:
+          node-version: 16
+      - name: Restore CI Cache
+        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 # tag=v3.0.2
+        id: cache-restore
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-16-${{ hashFiles('**/yarn.lock') }}
+      - name: Install Dependencies if Cache Miss
+        if: ${{ !steps.cache-restore.outputs.cache-hit }}
+        run: yarn --immutable
+      - name: Run ESLint
+        run: yarn lint --fix=false
+
+  Building:
+    name: Compile source code
+    runs-on: ubuntu-latest
+    if: "!contains(needs.pre_ci.outputs.commit_message, '[skip ci]')"
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
+      - name: Add problem matcher
+        run: echo "::add-matcher::.github/problemMatchers/tsc.json"
+      - name: Use Node.js v16.6
+        uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # tag=v3
+        with:
+          node-version: 16.6
+      - name: Restore CI Cache
+        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 # tag=v3.0.2
+        id: cache-restore
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-16.6-${{ hashFiles('**/yarn.lock') }}
+      - name: Install Dependencies if Cache Miss
+        if: ${{ !steps.cache-restore.outputs.cache-hit }}
+        run: yarn --immutable
+      - name: Build Code
+        run: yarn build

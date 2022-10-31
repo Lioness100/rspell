@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Yarn files
+yarn-error.log
+.yarn/*
+!.yarn/plugins
+!.yarn/releases
+!.yarn/patches
+
+# Compiled Javascript
+dist/
