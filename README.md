@@ -1,6 +1,6 @@
 <div align="center">
 
-# rspell
+# rspell (wip)
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Lioness100/sapphire-template/Continuous%20Integration)
 ![Repo Size](https://img.shields.io/github/repo-size/Lioness100/sapphire-template)

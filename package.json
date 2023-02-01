@@ -9,7 +9,9 @@
 	"type": "module",
 	"bin": "dist/cli.js",
 	"scripts": {
+		"start": "node --enable-source-maps dist/cli.js test.md",
 		"lint": "eslint src --ext ts --fix",
+		"test": "vitest run --globals",
 		"format": "prettier --write \"src/**/*.ts\"",
 		"update": "yarn upgrade-interactive",
 		"build": "tsup",
@@ -38,7 +40,9 @@
 		"eslint-plugin-unicorn": "^44.0.2",
 		"prettier": "^2.6.2",
 		"tsup": "^6.0.1",
-		"typescript": "^4.7.2"
+		"typescript": "^4.7.2",
+		"vite": "^3.2.4",
+		"vitest": "^0.25.3"
 	},
 	"engines": {
 		"node": ">=16.6"

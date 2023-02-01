@@ -2,39 +2,41 @@ import { stdout } from 'node:process';
 import type { URL } from 'node:url';
 import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
-import type { Issue, ProgressItem, TextOffset } from 'cspell';
+import type { Issue, ProgressItem } from 'cspell';
 import inquirer from 'inquirer';
 import inquirerSuggestionPlugin from 'inquirer-prompt-suggest';
 import ora, { type Ora } from 'ora';
-import { Action } from './handleIssue';
+import { Action } from './constants';
 import { centerText, clean } from './utils';
 
 inquirer.registerPrompt('suggest', inquirerSuggestionPlugin);
 
-const SLICE_LENGTH = 50;
-
-export const formatContext = (context: TextOffset, text: string, offset: number) => {
-	let contextLeft = context.text.slice(0, offset - context.offset);
-	let contextRight = context.text.slice(offset + text.length - context.offset);
-
-	if (contextLeft.length > SLICE_LENGTH) {
-		contextLeft = `...${clean(contextLeft.slice(-SLICE_LENGTH))}`;
-	}
-
-	if (contextRight.length > SLICE_LENGTH) {
-		contextRight = `${clean(contextRight.slice(0, SLICE_LENGTH))}...`;
-	}
-
-	return `${chalk.gray(clean(contextLeft).trimStart())}${chalk.red.underline(text)}${chalk.gray(clean(contextRight))}`;
+export const highlightText = (left: string, text: string, right: string) => {
+	return `${chalk.gray(clean(left).trimStart())}${chalk.red.underline(text)}${chalk.gray(clean(right).trimEnd())}`;
 };
 
-export const determineAction = async (url: URL, issue: Issue): Promise<[Action, string]> => {
-	const text = formatContext(issue.context, issue.text, issue.offset);
+export const formatContext = (issue: Issue) => {
+	const contextL = Math.max(issue.col - 41, 0);
+	const contextR = Math.min(issue.col + issue.text.length + 39, issue.line.text.length);
+
+	const left = clean(issue.line.text.slice(contextL, issue.col - 1));
+	const right = clean(issue.line.text.slice(issue.col + issue.text.length - 1, contextR));
+
+	return highlightText(left, issue.text, right);
+};
+
+export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): Promise<[Action, string]> => {
+	const text = formatContext(issue);
+	const path = fileURLToPath(url);
+	const trace = `:${issue.row}:${issue.col}`;
+
 	const typoLocation = chalk.bold(`${chalk.whiteBright(fileURLToPath(url))}${chalk.cyan(`:${issue.row}:${issue.col}`)}`);
-	const typoLocationHeader = centerText(typoLocation, stdout.columns);
+	const typoLocationHeader = centerText(typoLocation, path.length + trace.length, stdout.columns);
 	const line = '─'.repeat(stdout.columns);
 
 	console.log(`${typoLocationHeader}\n${line}\n\n${text}\n`);
+
+	const isReusedWord = issues.some((otherIssue) => otherIssue.text.toLowerCase() === issue.text.toLowerCase());
 
 	const { action } = await inquirer.prompt<{ action: Action }>({
 		type: 'list',
@@ -42,9 +44,13 @@ export const determineAction = async (url: URL, issue: Issue): Promise<[Action, 
 		message: 'Choose your action:',
 		choices: [
 			{ name: 'Ignore', value: Action.Ignore },
-			{ name: 'Ignore All', value: Action.IgnoreAll },
 			{ name: 'Replace', value: Action.Replace },
-			{ name: 'Replace All', value: Action.ReplaceAll },
+			...(isReusedWord
+				? [
+						{ name: 'Ignore (Current and Future)', value: Action.IgnoreAll },
+						{ name: 'Replace (Current and Future)', value: Action.ReplaceAll }
+				  ]
+				: []),
 			{ name: 'Skip File', value: Action.SkipFile },
 			{ name: chalk.red('Quit'), value: Action.Quit }
 		]
@@ -81,13 +87,14 @@ const setSpinnerText = (text: string) => {
 
 export const showProgress = (item: ProgressItem) => {
 	if (item.type === 'ProgressFileBegin') {
-		setSpinnerText(`Checking ${chalk.cyan(item.filename)} (${item.fileNum + 1}/${item.fileCount})`);
+		setSpinnerText(`Checking ${chalk.cyan(item.filename)} (${item.fileNum}/${item.fileCount})`);
 	} else {
+		const timeDisplay = `${item.elapsedTimeMs ? Math.trunc(item.elapsedTimeMs!) : '[unknown]'}ms`;
+		const errorDisplay = item.numErrors ? ` (${chalk.red(item.numErrors)} typos)` : '';
+
 		spinner.stopAndPersist({
 			symbol: item.numErrors ? chalk.red('❌') : chalk.green('✔'),
-			text: `Checked ${chalk.cyan(item.filename)} in ${item.elapsedTimeMs ? Math.trunc(item.elapsedTimeMs!) : '[unknown]'}ms${
-				item.numErrors ? ` (${chalk.red(item.numErrors)} typos)` : ''
-			}`
+			text: `Checked ${chalk.cyan(item.filename)} in ${timeDisplay}${errorDisplay}`
 		});
 	}
 };

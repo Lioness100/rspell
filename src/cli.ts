@@ -2,10 +2,10 @@
 
 import chalk from 'chalk';
 import { program } from 'commander';
-import type { ErrorLike, Issue } from 'cspell';
+import type { Issue } from 'cspell';
 import { lint } from 'cspell';
 import { resetDisplay, showProgress } from './display';
-import { handleIssue } from './handleIssue';
+import { handleIssues } from './handleIssue';
 import { emptyReporter, getPackageData } from './utils';
 
 interface CLIOptions {
@@ -30,49 +30,39 @@ program
 program.parse();
 
 const options = program.opts<CLIOptions>();
-
-const issues: Issue[] = [];
-const errors: [string, ErrorLike][] = [];
+const issues: (Issue & { resolved?: boolean })[] = [];
 
 const {
 	issues: issueCount,
 	files,
-	filesWithIssues
+	filesWithIssues,
+	errors
 } = await lint(
 	program.processedArgs[0],
 	{
 		config: options.config,
 		exclude: options.exclude,
 		showSuggestions: true,
-		verbose: true
+		showContext: false
 	},
 	{
 		debug: emptyReporter,
 		info: emptyReporter,
 		progress: showProgress,
 		result: emptyReporter,
-		error: (message, error) => errors.push([message, error]),
+		error: (message, error) => console.error(chalk.red(message), error),
 		issue: (issue) => issues.push(issue)
 	}
 );
 
-if (errors.length) {
-	for (const [message, error] of errors) {
-		console.error(chalk.red(message), error);
-	}
-
+if (errors) {
 	console.error(`\nSpell check failed with ${chalk.red(errors)} errors!`);
 } else {
 	resetDisplay();
-	let hasQuit = false;
+	const hasQuit = await handleIssues(issues);
 
-	for (const issue of issues.reverse()) {
-		hasQuit = (await handleIssue(issue, hasQuit)) ?? false;
-	}
+	const color = hasQuit ? chalk.yellow : chalk.green;
+	const adverb = hasQuit ? 'Partially' : 'Successfully';
 
-	console.log(
-		`\n${hasQuit ? 'Partially' : 'Successfully'} resolved ${chalk.green(issueCount)} issues in ${chalk.green(
-			`${filesWithIssues.size}/${files}`
-		)} matched files!`
-	);
+	console.log(`\n${adverb} resolved ${color(issueCount)} issues in ${color(`${filesWithIssues.size}/${files}`)} matched files!`);
 }
