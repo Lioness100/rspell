@@ -43,7 +43,7 @@ describe.each(allTypoSets)('%s', (name, data) => {
 		expect(writeFile, name).toBeCalledTimes(originalIssueLength);
 		expect(writeFile, name).lastCalledWith(new URL(lastIssueUri), data.fixed);
 
-		const recievedDisplays = originalDetermineActionIssueArguments.map((issue) => formatContext(issue));
-		expect(recievedDisplays).toMatchObject(data.displays);
+		const receivedDisplays = originalDetermineActionIssueArguments.map((issue) => formatContext(issue));
+		expect(receivedDisplays).toMatchObject(data.displays);
 	});
 });

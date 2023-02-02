@@ -20,7 +20,7 @@ program
 	.description(packageData.description)
 	.version(packageData.version)
 	.argument('[files...]', 'The glob patterns describing the files you want to spell check.', ['**'])
-	.option('-c, --config <cpell.json>', 'Configuration file to use. By default cspell looks for cspell.json in the current directory.')
+	.option('-c, --config <cspell.json>', 'Configuration file to use. By default cspell looks for cspell.json in the current directory.')
 	.option(
 		'-e, --exclude <glob>',
 		'Exclude files matching the glob pattern. This option can be used multiple times to add multiple globs.',
