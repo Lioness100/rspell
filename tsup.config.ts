@@ -7,5 +7,5 @@ export default defineConfig((options) => ({
 	format: ['esm'],
 	tsconfig: 'tsconfig.json',
 	sourcemap: true,
-	target: 'node18'
+	target: 'node16'
 }));
