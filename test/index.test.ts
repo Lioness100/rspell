@@ -1,9 +1,10 @@
-import { allTypoSets } from './fixtures/data';
 import { writeFile } from 'node:fs/promises';
-import { handleIssues } from '../src/handleIssue';
 import type { Issue } from 'cspell';
+import { vi, afterEach, describe, test, expect } from 'vitest';
+import { handleIssues } from '../src/handleIssue';
 import { formatContext } from '../src/display';
 import { Action } from '../src/constants';
+import { allTypoSets } from './fixtures/data';
 import { sampleReplacer } from './mocks/issue';
 
 let originalDetermineActionIssueArguments: Issue[] = [];
@@ -15,9 +16,9 @@ vi.mock('node:fs/promises', () => ({
 }));
 
 vi.mock('../src/display', async () => {
-	const module_ = await vi.importActual<typeof import('../src/display')>('../src/display');
+	const actualModule = await vi.importActual<typeof import('../src/display')>('../src/display');
 	return {
-		...module_,
+		...actualModule,
 		determineAction: vi.fn((_url: URL, issue: Issue) => {
 			originalDetermineActionIssueArguments.push(JSON.parse(JSON.stringify(issue)));
 			return [Action.Replace, sampleReplacer] as const;

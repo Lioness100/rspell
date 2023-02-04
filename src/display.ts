@@ -1,5 +1,3 @@
-import { stdout } from 'node:process';
-import type { URL } from 'node:url';
 import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 import type { Issue, ProgressItem } from 'cspell';
@@ -7,22 +5,27 @@ import inquirer from 'inquirer';
 import inquirerSuggestionPlugin from 'inquirer-prompt-suggest';
 import ora, { type Ora } from 'ora';
 import { Action } from './constants';
-import { centerText, clean } from './utils';
 
 inquirer.registerPrompt('suggest', inquirerSuggestionPlugin);
 
 export const highlightText = (left: string, text: string, right: string) => {
-	return `${chalk.gray(clean(left).trimStart())}${chalk.red.underline(text)}${chalk.gray(clean(right).trimEnd())}`;
+	return `${chalk.gray(left.trimStart())}${chalk.red.underline(text)}${chalk.gray(right.trimEnd())}`;
 };
 
 export const formatContext = (issue: Issue) => {
 	const contextL = Math.max(issue.col - 41, 0);
 	const contextR = Math.min(issue.col + issue.text.length + 39, issue.line.text.length);
 
-	const left = clean(issue.line.text.slice(contextL, issue.col - 1));
-	const right = clean(issue.line.text.slice(issue.col + issue.text.length - 1, contextR));
+	const left = issue.line.text.slice(contextL, issue.col - 1);
+	const right = issue.line.text.slice(issue.col + issue.text.length - 1, contextR);
 
 	return highlightText(left, issue.text, right);
+};
+
+export const centerText = (text: string, length: number, width: number) => {
+	const left = Math.floor((width - length) / 2);
+	const right = width - length - left;
+	return ' '.repeat(left) + text + ' '.repeat(right);
 };
 
 export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): Promise<[Action, string]> => {
@@ -30,9 +33,13 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 	const path = fileURLToPath(url);
 	const trace = `:${issue.row}:${issue.col}`;
 
-	const typoLocation = chalk.bold(`${chalk.whiteBright(fileURLToPath(url))}${chalk.cyan(`:${issue.row}:${issue.col}`)}`);
-	const typoLocationHeader = centerText(typoLocation, path.length + trace.length, stdout.columns);
-	const line = '─'.repeat(stdout.columns);
+	const typoLocation = chalk.bold(
+		`${chalk.whiteBright(fileURLToPath(url))}${chalk.cyan(`:${issue.row}:${issue.col}`)}`
+	);
+
+	const width = process.stdout.columns;
+	const typoLocationHeader = centerText(typoLocation, path.length + trace.length, width);
+	const line = '─'.repeat(width);
 
 	console.log(`${typoLocationHeader}\n${line}\n\n${text}\n`);
 
@@ -73,7 +80,7 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 };
 
 export const resetDisplay = () => {
-	stdout.write('\u001B[2J\u001B[0;0H');
+	process.stdout.write('\u001B[2J\u001B[0;0H');
 };
 
 let spinner: Ora;
@@ -85,11 +92,15 @@ const setSpinnerText = (text: string) => {
 	}
 };
 
+export const showStartupMessage = (globs: string[]) => {
+	setSpinnerText(`Finding files matching ${chalk.cyan(globs.join(', '))}`);
+};
+
 export const showProgress = (item: ProgressItem) => {
 	if (item.type === 'ProgressFileBegin') {
 		setSpinnerText(`Checking ${chalk.cyan(item.filename)} (${item.fileNum}/${item.fileCount})`);
 	} else {
-		const timeDisplay = `${item.elapsedTimeMs ? Math.trunc(item.elapsedTimeMs!) : '[unknown]'}ms`;
+		const timeDisplay = `${item.elapsedTimeMs ? Math.trunc(item.elapsedTimeMs) : '[unknown]'}ms`;
 		const errorDisplay = item.numErrors ? ` (${chalk.red(item.numErrors)} typos)` : '';
 
 		spinner.stopAndPersist({

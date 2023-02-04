@@ -1,10 +1,10 @@
-import { createIssueMock, IssueMockData, sampleFixed, sampleText, createSampleDisplay } from '../mocks/issue';
+import { createIssueMock, type IssueMockData, sampleFixed, sampleText, createSampleDisplay } from '../mocks/issue';
 
 interface TypoSetData {
-	text: string;
-	fixed: string;
 	displays: string[];
+	fixed: string;
 	issues: IssueMockData[];
+	text: string;
 }
 
 const oneTypoOnOneLine: TypoSetData = {

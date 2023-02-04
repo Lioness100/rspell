@@ -1,11 +1,8 @@
 {
-	"extends": "@sapphire/ts-config/extra-strict",
-	"compilerOptions": {
-		"outDir": "dist",
-		"noEmit": true,
-		"target": "ESNext",
-		"module": "ESNext",
-		"noImplicitReturns": false,
-		"types": ["vitest/globals"]
-	}
+    "extends": "@lioness100/configs/tsconfig",
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src",
+    },
+    "include": ["src"]
 }

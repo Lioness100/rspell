@@ -27,7 +27,7 @@ jobs:
       - name: Build Code
         run: yarn build --minify
       - name: Build Binaries
-        run: npx pkg . --compress GZip --public
+        run: npx pkg dist/cli.cjs --compress GZip --public
       - name: Release
         uses: marvinpinto/action-automatic-releases@latest
         with:

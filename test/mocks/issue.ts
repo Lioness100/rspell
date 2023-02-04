@@ -7,8 +7,8 @@ export const sampleReplacer = 'happy' as const;
 
 export interface IssueMockData {
 	line: string;
-	offset: number;
 	lineOffset: number;
+	offset: number;
 	row: number;
 }
 
@@ -22,7 +22,7 @@ export const createIssueMock = (data: IssueMockData): Issue => ({
 	row: data.row
 });
 
-export const createSampleDisplay = ({ before, after }: { before?: number; after?: number } = {}) => {
+export const createSampleDisplay = ({ before, after }: { after?: number; before?: number } = {}) => {
 	return highlightText(
 		`${before ? `${sampleFixed.repeat(before ?? 0)} ` : ''}I am `,
 		'happpy',
