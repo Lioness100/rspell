@@ -25,13 +25,13 @@ jobs:
         if: ${{ !steps.cache-restore.outputs.cache-hit }}
         run: yarn --immutable
       - name: Build Code
-        run: yarn build
+        run: yarn build --minify
       - name: Build Binaries
-        run: npx pkg .
+        run: npx pkg . --compress GZip --public
       - name: Release
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: false
           files: |
             rspell-linux
