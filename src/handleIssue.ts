@@ -37,27 +37,28 @@ export const updateFutureIssues = (issue: Issue, replacer: string, issues: Issue
 	}
 };
 
-export const handleIssues = async (issues: Issue[], /* for testing */ replacerOverride?: string) => {
+export const handleIssues = async (issues: Issue[]) => {
 	for (const issue of [...issues]) {
 		if (!issues.includes(issue)) {
 			continue;
 		}
 
 		issues.splice(issues.indexOf(issue), 1);
-		const hasQuit = await handleIssue(issues, issue, replacerOverride);
+
+		const hasQuit = await handleIssue(issues, issue);
 		if (hasQuit) {
 			return true;
 		}
 	}
 };
 
-export const handleIssue = async (issues: (Issue & { resolved?: boolean })[], issue: Issue & { resolved?: boolean }, replacerOverride?: string) => {
+export const handleIssue = async (issues: (Issue & { resolved?: boolean })[], issue: Issue & { resolved?: boolean }) => {
 	if (!issue.uri) {
 		return;
 	}
 
 	const url = new URL(issue.uri);
-	const [action, replacer] = replacerOverride ? [Action.Replace, replacerOverride] : await determineAction(url, issue, issues);
+	const [action, replacer] = await determineAction(url, issue, issues);
 
 	if (action === Action.Replace || action === Action.ReplaceAll) {
 		updateFutureIssues(issue, replacer, issues);

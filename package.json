@@ -8,7 +8,6 @@
 	"license": "Apache-2.0",
 	"bin": "dist/cli.js",
 	"scripts": {
-		"start": "node dist/cli.js test.md",
 		"lint": "eslint src --ext ts --fix",
 		"test": "vitest run --globals",
 		"format": "prettier --write \"src/**/*.ts\"",
