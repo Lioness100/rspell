@@ -3,7 +3,6 @@
 # rspell (wip)
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Lioness100/rspell/ci.yml?branch=main)
-![Repo Size](https://img.shields.io/github/repo-size/Lioness100/sapphire-template)
 ![License](https://img.shields.io/github/license/Lioness100/sapphire-template)
 
 </div>
