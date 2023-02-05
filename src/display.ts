@@ -50,7 +50,7 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 	console.log(`${typoLocationHeader}\n${line}\n\n${text}\n`);
 
 	// IgnoreAll and ReplaceAll are only available if the typo is reused.
-	const isReusedWord = issues.some((otherIssue) => otherIssue.text.toLowerCase() === issue.text.toLowerCase());
+	const isReusedWord = issues.some((otherIssue) => otherIssue.text === issue.text);
 
 	const { action } = await inquirer.prompt<{ action: Action }>({
 		type: 'list',
@@ -105,6 +105,10 @@ const setSpinnerText = (text: string) => {
 
 export const showStartupMessage = (globs: string[]) => {
 	setSpinnerText(`Finding files matching ${chalk.cyan(globs.join(', '))}`);
+};
+
+export const stopSpinner = () => {
+	spinner.stop();
 };
 
 export const showProgress = (item: ProgressItem) => {

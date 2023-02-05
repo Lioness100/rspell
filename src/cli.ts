@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import { program } from 'commander';
 import type { Issue } from 'cspell';
 import { lint } from 'cspell';
-import { resetDisplay, showProgress, showStartupMessage } from './display';
+import { resetDisplay, showProgress, showStartupMessage, stopSpinner } from './display';
 import { handleIssues } from './handleIssue';
 
 interface CLIOptions {
@@ -66,6 +66,8 @@ const start = async () => {
 
 		const color = hasQuit ? chalk.yellow : chalk.green;
 		const adverb = hasQuit ? 'Partially' : 'Successfully';
+
+		stopSpinner();
 
 		console.log(
 			`\n${adverb} resolved ${color(issueCount)} issues in ${color(

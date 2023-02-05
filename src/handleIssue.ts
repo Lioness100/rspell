@@ -22,7 +22,26 @@ export const updateFutureIssues = (issue: Issue, replacer: string, issues: Issue
 
 	for (const futureIssue of issues) {
 		// Only update issues that are in the same file, and are after the issue we just fixed.
-		if (futureIssue.uri !== issue.uri || futureIssue.offset < issue.offset) {
+		if (futureIssue.uri !== issue.uri) {
+			continue;
+		}
+
+		// A row comparison is made before checking that the offset is greater than the issue's offset. This is because,
+		// if an typo is fixed via ReplaceAll, then the context of any issues on the same row should be updated,
+		// regardless of if the issue is before or after the fixed typo.
+		if (futureIssue.row === issue.row) {
+			// Only calculate the new line text once, then cache it. This is a negligible performance improvement, but it's
+			// honest work.
+			cachedLineText ??=
+				issue.line.text.slice(0, issue.col - 1) +
+				replacer +
+				issue.line.text.slice(issue.col + issue.text.length - 1);
+
+			// This is used to display the context of the issue, so it needs to be updated.
+			futureIssue.line.text = cachedLineText;
+		}
+
+		if (futureIssue.offset < issue.offset) {
 			continue;
 		}
 
@@ -35,16 +54,6 @@ export const updateFutureIssues = (issue: Issue, replacer: string, issues: Issue
 			continue;
 		}
 
-		// Only calculate the new line text once, then cache it. This is a negligible performance improvement, but it's
-		// honest work.
-		cachedLineText ??=
-			issue.line.text.slice(0, issue.col - 1) +
-			replacer +
-			issue.line.text.slice(issue.col + issue.text.length - 1);
-
-		// This is used to display the context of the issue, so it needs to be updated.
-		futureIssue.line.text = cachedLineText;
-
 		// If the issue is before the column we just replaced, then we don't need to update the column.
 		if (futureIssue.col < issue.col) {
 			continue;
@@ -54,15 +63,21 @@ export const updateFutureIssues = (issue: Issue, replacer: string, issues: Issue
 	}
 };
 
+export const fixIssue = async (issues: Issue[], issue: Issue, replacer: string, url: URL) => {
+	updateFutureIssues(issue, replacer, issues);
+	await writeChangeToFile(url, issue, replacer);
+};
+
 export const performSideEffects = async (issues: Issue[], issue: Issue, action: Action, replacer: string, url: URL) => {
 	// The issues array is modified in place, so we need to make a copy of it.
 	for (const futureIssue of [...issues]) {
 		if (
+			!futureIssue.uri ||
 			// If we're skipping the file, we only want to remove issues that share the same URI. Otherwise (action
 			// is ReplaceAll or IgnoreAll), we want to remove issues that share the same text.
 			action === Action.SkipFile
 				? futureIssue.uri !== issue.uri
-				: futureIssue.text.toLowerCase() !== issue.text.toLowerCase()
+				: futureIssue.text !== issue.text
 		) {
 			continue;
 		}
@@ -78,8 +93,7 @@ export const performSideEffects = async (issues: Issue[], issue: Issue, action: 
 		// was a normal Replace action.
 		// TODO: If multiple of these issues are in the same file, we should store the file contents in memory and
 		// only write it once at the end.
-		updateFutureIssues(futureIssue, replacer, issues);
-		await writeChangeToFile(url, futureIssue, replacer);
+		await fixIssue(issues, futureIssue, replacer, futureIssue.uri === issue.uri ? url : new URL(futureIssue.uri!));
 	}
 };
 
@@ -92,8 +106,7 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 	const [action, replacer] = await determineAction(url, issue, issues);
 
 	if (action === Action.Replace || action === Action.ReplaceAll) {
-		updateFutureIssues(issue, replacer, issues);
-		await writeChangeToFile(url, issue, replacer);
+		await fixIssue(issues, issue, replacer, url);
 	}
 
 	// The following actions all have side effects (as in, they require modification of future issues).
