@@ -14,6 +14,8 @@ interface CLIOptions {
 program
 	.name('rspell')
 	.description("📝 Find and fix all your project's typos with a single command!")
+	// The below version is injected via esbuild-plugin-version-injector. The program could read from package.json, but
+	// that wouldn't work for the generated executable files.
 	.version('[VI]{{inject}}[/VI]')
 	.argument('[files…]', 'The glob patterns describing the files you want to spell check.', ['**'])
 	.option(
@@ -49,9 +51,6 @@ const start = async () => {
 			showContext: false
 		},
 		{
-			debug: () => null,
-			info: () => null,
-			result: () => void null,
 			progress: showProgress,
 			error: (message, error) => console.error(chalk.red(message), error),
 			issue: (issue) => issues.push(issue)
@@ -75,5 +74,7 @@ const start = async () => {
 	}
 };
 
+// Top level await cannot be used because this code must be compiled to a CommonJS module for compatibility with `pkg`,
+// which is used to generate the executable files.
 // eslint-disable-next-line unicorn/prefer-top-level-await
 start().catch(console.error);

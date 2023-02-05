@@ -7,7 +7,9 @@ export const sampleReplacer = 'happy' as const;
 
 export interface IssueMockData {
 	line: string;
+	// Offset of the text in the line
 	lineOffset: number;
+	// Offset of the text in the file
 	offset: number;
 	row: number;
 }
