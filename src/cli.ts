@@ -17,15 +17,16 @@ program
 	// The below version is injected via esbuild-plugin-version-injector. The program could read from package.json, but
 	// that wouldn't work for the generated executable files.
 	.version('[VI]{{inject}}[/VI]')
-	.argument('[files…]', 'The glob patterns describing the files you want to spell check.', ['**'])
+	// eslint-disable-next-line unicorn/string-content
+	.argument('[files...]', 'The glob patterns describing the files you want to spell check.', ['**'])
 	.option(
 		'-c, --config <cspell.json>',
 		'Configuration file to use. By default cspell looks for cspell.json in the current directory.'
 	)
 	.option(
-		'-e, --exclude <glob>',
-		'Exclude files matching the glob pattern. This option can be used multiple times to add multiple globs.',
-		(value, previous?: string[]) => [...(previous ?? []), value]
+		// eslint-disable-next-line unicorn/string-content
+		'-e, --exclude <globs...>',
+		'Exclude files matching the glob pattern. This option can be used multiple times to add multiple globs.'
 	);
 
 program.parse();

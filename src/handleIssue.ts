@@ -37,12 +37,10 @@ export const updateFutureIssues = (issue: Issue, replacer: string, issues: Issue
 
 		// Only calculate the new line text once, then cache it. This is a negligible performance improvement, but it's
 		// honest work.
-		if (!cachedLineText) {
-			cachedLineText =
-				issue.line.text.slice(0, issue.col - 1) +
-				replacer +
-				issue.line.text.slice(issue.col + issue.text.length - 1);
-		}
+		cachedLineText ??=
+			issue.line.text.slice(0, issue.col - 1) +
+			replacer +
+			issue.line.text.slice(issue.col + issue.text.length - 1);
 
 		// This is used to display the context of the issue, so it needs to be updated.
 		futureIssue.line.text = cachedLineText;
@@ -53,6 +51,35 @@ export const updateFutureIssues = (issue: Issue, replacer: string, issues: Issue
 		}
 
 		futureIssue.col += lengthDifference;
+	}
+};
+
+export const performSideEffects = async (issues: Issue[], issue: Issue, action: Action, replacer: string, url: URL) => {
+	// The issues array is modified in place, so we need to make a copy of it.
+	for (const futureIssue of [...issues]) {
+		if (
+			// If we're skipping the file, we only want to remove issues that share the same URI. Otherwise (action
+			// is ReplaceAll or IgnoreAll), we want to remove issues that share the same text.
+			action === Action.SkipFile
+				? futureIssue.uri !== issue.uri
+				: futureIssue.text.toLowerCase() !== issue.text.toLowerCase()
+		) {
+			continue;
+		}
+
+		issues.splice(issues.indexOf(futureIssue), 1);
+
+		// If we're ignoring the issue, we don't need to do any more work.
+		if (action !== Action.ReplaceAll) {
+			continue;
+		}
+
+		// Otherwise, we update the offsets of future issues and write the change to file, just as we would if it
+		// was a normal Replace action.
+		// TODO: If multiple of these issues are in the same file, we should store the file contents in memory and
+		// only write it once at the end.
+		updateFutureIssues(futureIssue, replacer, issues);
+		await writeChangeToFile(url, futureIssue, replacer);
 	}
 };
 
@@ -71,32 +98,7 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 
 	// The following actions all have side effects (as in, they require modification of future issues).
 	if (action === Action.ReplaceAll || action === Action.IgnoreAll || action === Action.SkipFile) {
-		// The issues array is modified in place, so we need to make a copy of it.
-		for (const futureIssue of [...issues]) {
-			if (
-				// If we're skipping the file, we only want to remove issues that share the same URI. Otherwise (action
-				// is ReplaceAll or IgnoreAll), we want to remove issues that share the same text.
-				action === Action.SkipFile
-					? futureIssue.uri !== issue.uri
-					: futureIssue.text.toLowerCase() !== issue.text.toLowerCase()
-			) {
-				continue;
-			}
-
-			issues.splice(issues.indexOf(futureIssue), 1);
-
-			// If we're ignoring the issue, we don't need to do any more work.
-			if (action !== Action.ReplaceAll) {
-				continue;
-			}
-
-			// Otherwise, we update the offsets of future issues and write the change to file, just as we would if it
-			// was a normal Replace action.
-			// TODO: If multiple of these issues are in the same file, we should store the file contents in memory and
-			// only write it once at the end.
-			updateFutureIssues(futureIssue, replacer, issues);
-			await writeChangeToFile(url, futureIssue, replacer);
-		}
+		await performSideEffects(issues, issue, action, replacer, url);
 	}
 
 	resetDisplay();

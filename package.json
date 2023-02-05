@@ -11,7 +11,7 @@
 	"scripts": {
 		"lint": "eslint .",
 		"test": "vitest run",
-		"format": "prettier --write \"src/**/*.ts\"",
+		"format": "prettier --write \"{*,src/**/*}.{json,js,ts}\"",
 		"update": "yarn upgrade-interactive",
 		"build": "tsup",
 		"watch": "tsup --watch",
