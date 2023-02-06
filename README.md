@@ -9,12 +9,7 @@
 
 > 📝 Find and fix all your project's typos with a single command!
 
-## 📖 Table of Contents
-
-- [📝 Description](#-description)
-- [📦 Installation](#-installation)
-- [🚀 Usage](#-usage)
-- [👥 Contributors](#-contributors)
+https://user-images.githubusercontent.com/65814829/216869223-62ef0f71-c59a-4f6f-8096-2353d6173124.mp4
 
 ## 📝 Description
 
