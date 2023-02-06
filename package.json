@@ -1,13 +1,18 @@
 {
 	"name": "rspell",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"description": "📝 Find and fix all your project's typos with a single command!",
 	"main": "dist/cli.js",
 	"repository": "https://github.com/Lioness100/rspell",
+	"bugs": "https://github.com/Lioness100/rspell/issues",
+	"homepage": "https://github.com/Lioness100/rspell/#readme",
 	"author": "Lioness100",
 	"license": "Apache-2.0",
 	"bin": "dist/cli.js",
 	"type": "module",
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"lint": "eslint .",
 		"test": "vitest run",
@@ -37,6 +42,16 @@
 		"vite": "^4.1.1",
 		"vitest": "^0.28.4"
 	},
+	"files": [],
+	"keywords": [
+		"cspell",
+		"spell",
+		"spellcheck",
+		"spellchecker",
+		"spell-check",
+		"spell-checker",
+		"cli"
+	],
 	"engines": {
 		"node": ">=16.6"
 	},
