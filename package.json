@@ -9,7 +9,6 @@
 	"author": "Lioness100",
 	"license": "Apache-2.0",
 	"bin": "dist/cli.js",
-	"type": "module",
 	"publishConfig": {
 		"access": "public"
 	},
@@ -23,7 +22,7 @@
 		"typecheck": "tsc -b src"
 	},
 	"dependencies": {
-		"chalk": "^5.2.0",
+		"colorette": "^2.0.19",
 		"commander": "^10.0.0",
 		"cspell": "^6.21.0",
 		"inquirer": "^8.2.5",

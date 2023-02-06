@@ -5,9 +5,8 @@ export default defineConfig((options) => ({
 	clean: true,
 	minify: !options.watch,
 	entry: ['src/cli.ts'],
-	format: [options.minify ? 'cjs' : 'esm'],
+	format: ['cjs'],
 	plugins: [esbuildPluginVersionInjector()],
 	target: 'node16',
-	sourcemap: !options.minify,
-	noExternal: options.minify ? ['chalk'] : undefined
+	sourcemap: !options.minify
 }));

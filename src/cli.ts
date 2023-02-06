@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import chalk from 'chalk';
+import { red } from 'colorette';
 import { program } from 'commander';
 import type { Issue } from 'cspell';
 import { lint } from 'cspell';
-import { resetDisplay, showProgress, showStartupMessage, stopSpinner } from './display';
+import { reportErrors, reportSuccess, resetDisplay, showProgress, showStartupMessage } from './display';
 import { handleIssues } from './handleIssue';
 
 interface CLIOptions {
@@ -61,31 +61,20 @@ const start = async () => {
 		},
 		{
 			progress: showProgress,
-			error: (message, error) => console.error(chalk.red(message), error),
+			error: (message, error) => console.error(red(message), error),
 			issue: (issue) => issues.push(issue)
 		}
 	);
 
 	if (errors) {
-		console.error(`\nSpell check failed with ${chalk.red(errors)} errors!`);
+		reportErrors(errors);
 	} else {
 		resetDisplay();
 		const hasQuit = await handleIssues(issues);
 
-		const color = hasQuit ? chalk.yellow : chalk.green;
-		const adverb = hasQuit ? 'Partially' : 'Successfully';
-
-		stopSpinner();
-
-		console.log(
-			`\n${adverb} resolved ${color(issueCount)} issues in ${color(
-				`${filesWithIssues.size}/${files}`
-			)} matched files!`
-		);
+		reportSuccess(hasQuit, files, filesWithIssues.size, issueCount);
 	}
 };
 
-// Top level await cannot be used because this code must be compiled to a CommonJS module for compatibility with `pkg`,
-// which is used to generate the executable files.
 // eslint-disable-next-line unicorn/prefer-top-level-await
 start().catch(console.error);

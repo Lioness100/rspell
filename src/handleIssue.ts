@@ -134,4 +134,6 @@ export const handleIssues = async (issues: Issue[]) => {
 			return true;
 		}
 	}
+
+	return false;
 };

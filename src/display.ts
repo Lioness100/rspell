@@ -1,15 +1,15 @@
 import { fileURLToPath } from 'node:url';
-import chalk from 'chalk';
 import type { Issue, ProgressItem } from 'cspell';
 import inquirer from 'inquirer';
 import inquirerSuggestionPlugin from 'inquirer-prompt-suggest';
 import ora, { type Ora } from 'ora';
+import { bold, cyan, gray, green, red, underline, whiteBright, yellow } from 'colorette';
 import { Action } from './constants';
 
 inquirer.registerPrompt('suggest', inquirerSuggestionPlugin);
 
 export const highlightText = (left: string, text: string, right: string) => {
-	return `${chalk.gray(left.trimStart())}${chalk.red.underline(text)}${chalk.gray(right.trimEnd())}`;
+	return `${gray(left.trimStart())}${red(underline(text))}${gray(right.trimEnd())}`;
 };
 
 // Given an issue, this function will use issue.line.text to determine the 40 characters on either side of the issue
@@ -39,9 +39,7 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 	// Create a header that displays the absolute path to the file and the line and column of the typo. This header
 	// is centered in the terminal (the width of the terminal is stored in process.stdout.columns)
 
-	const typoLocation = chalk.bold(
-		`${chalk.whiteBright(fileURLToPath(url))}${chalk.cyan(`:${issue.row}:${issue.col}`)}`
-	);
+	const typoLocation = bold(`${whiteBright(fileURLToPath(url))}${cyan(`:${issue.row}:${issue.col}`)}`);
 
 	const width = process.stdout.columns;
 	const typoLocationHeader = centerText(typoLocation, path.length + trace.length, width);
@@ -61,12 +59,12 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 			{ name: 'Replace', value: Action.Replace },
 			...(otherTypoInstancesCount
 				? [
-						{ name: `Ignore All (${otherTypoInstancesCount})`, value: Action.IgnoreAll },
-						{ name: `Replace All (${otherTypoInstancesCount})`, value: Action.ReplaceAll }
+						{ name: `Ignore All (${cyan(otherTypoInstancesCount)})`, value: Action.IgnoreAll },
+						{ name: `Replace All (${cyan(otherTypoInstancesCount)})`, value: Action.ReplaceAll }
 				  ]
 				: []),
 			{ name: 'Skip File', value: Action.SkipFile },
-			{ name: chalk.red('Quit'), value: Action.Quit }
+			{ name: red('Quit'), value: Action.Quit }
 		]
 	});
 
@@ -105,7 +103,7 @@ const setSpinnerText = (text: string) => {
 };
 
 export const showStartupMessage = (globs: string[]) => {
-	setSpinnerText(`Finding files matching ${chalk.cyan(globs.join(', '))}`);
+	setSpinnerText(`Finding files matching ${cyan(globs.join(', '))}`);
 };
 
 export const stopSpinner = () => {
@@ -114,14 +112,29 @@ export const stopSpinner = () => {
 
 export const showProgress = (item: ProgressItem) => {
 	if (item.type === 'ProgressFileBegin') {
-		setSpinnerText(`Checking ${chalk.cyan(item.filename)} (${item.fileNum}/${item.fileCount})`);
+		setSpinnerText(`Checking ${cyan(item.filename)} (${item.fileNum}/${item.fileCount})`);
 	} else {
 		const timeDisplay = `${item.elapsedTimeMs ? Math.trunc(item.elapsedTimeMs) : '[unknown]'}ms`;
-		const errorDisplay = item.numErrors ? ` (${chalk.red(item.numErrors)} typos)` : '';
+		const errorDisplay = item.numErrors ? ` (${red(item.numErrors)} typos)` : '';
 
 		spinner.stopAndPersist({
-			symbol: item.numErrors ? chalk.red('❌') : chalk.green('✔'),
-			text: `Checked ${chalk.cyan(item.filename)} in ${timeDisplay}${errorDisplay}`
+			symbol: item.numErrors ? red('❌') : green('✔'),
+			text: `Checked ${cyan(item.filename)} in ${timeDisplay}${errorDisplay}`
 		});
 	}
+};
+
+export const reportErrors = (errors: number) => {
+	console.error(`\nSpell check failed with ${red(errors)} errors!`);
+};
+
+export const reportSuccess = (hasQuit: boolean, issues: number, files: number, filesWithIssues: number) => {
+	const color = hasQuit ? yellow : green;
+	const adverb = hasQuit ? 'Partially' : 'Successfully';
+
+	stopSpinner();
+
+	console.log(
+		`\n${adverb} resolved ${color(issues)} issues in ${color(`${filesWithIssues}/${files}`)} matched files!`
+	);
 };
