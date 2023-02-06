@@ -59,8 +59,8 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 			{ name: 'Replace', value: Action.Replace },
 			...(otherTypoInstancesCount
 				? [
-						{ name: `Ignore All (${cyan(otherTypoInstancesCount)})`, value: Action.IgnoreAll },
-						{ name: `Replace All (${cyan(otherTypoInstancesCount)})`, value: Action.ReplaceAll }
+						{ name: `Ignore All (${cyan(otherTypoInstancesCount + 1)})`, value: Action.IgnoreAll },
+						{ name: `Replace All (${cyan(otherTypoInstancesCount + 1)})`, value: Action.ReplaceAll }
 				  ]
 				: []),
 			{ name: 'Skip File', value: Action.SkipFile },
