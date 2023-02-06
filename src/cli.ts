@@ -7,8 +7,12 @@ import { reportErrors, reportSuccess, resetDisplay, showProgress, showStartupMes
 import { handleIssues } from './handleIssue';
 
 interface CLIOptions {
+	cache?: boolean;
 	config?: string;
+	dot?: boolean;
 	exclude?: string[];
+	locale?: string;
+	useGitignore?: boolean;
 }
 
 program
@@ -31,11 +35,12 @@ Examples:
 		'-c, --config <cspell.json>',
 		'Configuration file to use. By default cspell looks for cspell.json in the current directory.'
 	)
-	.option(
-		// eslint-disable-next-line unicorn/string-content
-		'-e, --exclude <globs...>',
-		'Exclude files matching the glob pattern. This option can be used multiple times to add multiple globs.'
-	);
+	// eslint-disable-next-line unicorn/string-content
+	.option('-e, --exclude <globs...>', 'Exclude files matching the glob pattern.')
+	.option('-g, --use-gitignore', 'Use the .gitignore file to exclude files.')
+	.option('-C, --cache', 'Store the info about processed files in order to only operate on the changed ones.')
+	.option('-d, --dot', 'Determine if files/directories starting with "." should be part of the glob search.')
+	.option('-l, --locale <locale>', 'Explicitly set the locale to use for spell checking.');
 
 program.parse();
 
@@ -56,6 +61,10 @@ const start = async () => {
 		{
 			config: options.config,
 			exclude: options.exclude,
+			gitignore: options.useGitignore,
+			cache: options.cache,
+			dot: options.dot,
+			locale: options.locale,
 			showSuggestions: true,
 			showContext: false
 		},

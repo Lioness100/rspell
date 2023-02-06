@@ -43,8 +43,12 @@ Arguments:
 
 Options:
   -V, --version               output the version number
-  -c, --config <cspell.json>  Configuration file to use. By default cspell looks for cspell.json in the current directory.
-  -e, --exclude <globs...>    Exclude files matching the glob pattern. This option can be used multiple times to add multiple globs.        
+  -c, --config <cspell.json>  Configuration file to use. By default cspell looks for cspell.json in the current directory.       
+  -e, --exclude <globs...>    Exclude files matching the glob pattern.
+  -g, --use-gitignore         Use the .gitignore file to exclude files.
+  -C, --cache                 Store the info about processed files in order to only operate on the changed ones.
+  -d, --dot                   Determine if files/directories starting with "." should be part of the glob search.
+  -l, --locale <locale>       Explicitly set the locale to use for spell checking.
   -h, --help                  display help for command
 ```
 
