@@ -50,7 +50,7 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 	console.log(`${typoLocationHeader}\n${line}\n\n${text}\n`);
 
 	// IgnoreAll and ReplaceAll are only available if the typo is reused.
-	const isReusedWord = issues.some((otherIssue) => otherIssue.text === issue.text);
+	const otherTypoInstancesCount = issues.filter((otherIssue) => otherIssue.text === issue.text).length;
 
 	const { action } = await inquirer.prompt<{ action: Action }>({
 		type: 'list',
@@ -59,10 +59,10 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 		choices: [
 			{ name: 'Ignore', value: Action.Ignore },
 			{ name: 'Replace', value: Action.Replace },
-			...(isReusedWord
+			...(otherTypoInstancesCount
 				? [
-						{ name: 'Ignore (Current and Future)', value: Action.IgnoreAll },
-						{ name: 'Replace (Current and Future)', value: Action.ReplaceAll }
+						{ name: `Ignore All (${otherTypoInstancesCount})`, value: Action.IgnoreAll },
+						{ name: `Replace All (${otherTypoInstancesCount})`, value: Action.ReplaceAll }
 				  ]
 				: []),
 			{ name: 'Skip File', value: Action.SkipFile },
