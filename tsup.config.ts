@@ -8,5 +8,5 @@ export default defineConfig((options) => ({
 	format: ['cjs'],
 	plugins: [esbuildPluginVersionInjector()],
 	target: 'node16',
-	sourcemap: !options.minify
+	sourcemap: true
 }));

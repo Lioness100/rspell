@@ -25,7 +25,7 @@ jobs:
         if: ${{ !steps.cache-restore.outputs.cache-hit }}
         run: yarn --immutable
       - name: Build Code
-        run: yarn build --minify
+        run: yarn build
       - name: Build Binaries
         run: npx pkg dist/cli.js --C GZip --public -o rspell -t macos,windows,linux
       - name: Release
