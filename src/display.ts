@@ -81,7 +81,8 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 			type: issue.suggestions?.length ? 'suggest' : 'input',
 			name: 'replacer',
 			message: 'What should the typo be replaced with?',
-			suggestions: issue.suggestions
+			// Inquirer-prompt-suggest seems to display the first suggestion last
+			suggestions: issue.suggestions?.length ? [issue.suggestions.pop(), ...issue.suggestions] : []
 		}
 	]);
 

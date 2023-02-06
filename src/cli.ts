@@ -13,7 +13,15 @@ interface CLIOptions {
 
 program
 	.name('rspell')
-	.description("📝 Find and fix all your project's typos with a single command!")
+	.description(
+		`📝 Find and fix all your project's typos with a single command!
+
+Examples:
+  $ rspell                                            Check all files
+  $ rspell "src/**/*.ts"                              Check all TypeScript files in the src directory
+  $ rspell --config some-file.json                    Use a custom configuration file
+  $ rspell "test" --exclude "**/__snapshots__/**"     Exclude files in the __snapshots__ directory`
+	)
 	// The below version is injected via esbuild-plugin-version-injector. The program could read from package.json, but
 	// that wouldn't work for the generated executable files.
 	.version('[VI]{{inject}}[/VI]')
