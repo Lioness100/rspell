@@ -85,6 +85,10 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 		}
 	]);
 
+	if (!replacer) {
+		return [Action.Ignore, ''];
+	}
+
 	return [action, replacer];
 };
 
