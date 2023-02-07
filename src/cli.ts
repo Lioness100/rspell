@@ -81,7 +81,7 @@ const start = async () => {
 		resetDisplay();
 		const hasQuit = await handleIssues(issues);
 
-		reportSuccess(hasQuit, files, filesWithIssues.size, issueCount);
+		reportSuccess(hasQuit, issueCount, files, filesWithIssues.size);
 	}
 };
 

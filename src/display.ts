@@ -49,6 +49,7 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 
 	// IgnoreAll and ReplaceAll are only available if the typo is reused.
 	const otherTypoInstancesCount = issues.filter((otherIssue) => otherIssue.text === issue.text).length;
+	const otherTyposInFileCount = issues.filter((otherIssue) => otherIssue.uri === issue.uri).length;
 
 	const { action } = await inquirer.prompt<{ action: Action }>({
 		type: 'list',
@@ -63,7 +64,7 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 						{ name: `Replace All (${cyan(otherTypoInstancesCount + 1)})`, value: Action.ReplaceAll }
 				  ]
 				: []),
-			{ name: 'Skip File', value: Action.SkipFile },
+			{ name: `Skip File (${cyan(otherTyposInFileCount + 1)})`, value: Action.SkipFile },
 			{ name: red('Quit'), value: Action.Quit }
 		]
 	});
