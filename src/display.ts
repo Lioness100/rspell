@@ -54,7 +54,7 @@ export const determineAction = async (
 	const typoLocationHeader = centerText(typoLocation, path.length + trace.length + progressIndicator.length, width);
 
 	const progress = Math.floor((index / totalIssueCount) * width);
-	const line = bold(greenBright('─'.repeat(progress)) + '─'.repeat(width - progress));
+	const line = bold(greenBright('─'.repeat(progress)) + '─'.repeat(Math.max(0, width - progress)));
 
 	console.log(`${typoLocationHeader}\n${line}\n\n${text}\n`);
 
