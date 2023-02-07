@@ -80,7 +80,6 @@ const start = async () => {
 	} else {
 		resetDisplay();
 		const hasQuit = await handleIssues(issues);
-
 		reportSuccess(hasQuit, issueCount, files, filesWithIssues.size);
 	}
 };

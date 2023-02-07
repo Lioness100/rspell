@@ -97,13 +97,14 @@ export const performSideEffects = async (issues: Issue[], issue: Issue, action: 
 	}
 };
 
+let totalIssueCount = 0;
 export const handleIssue = async (issues: Issue[], issue: Issue) => {
 	if (!issue.uri) {
 		return;
 	}
 
 	const url = new URL(issue.uri);
-	const [action, replacer] = await determineAction(url, issue, issues);
+	const [action, replacer] = await determineAction(url, issue, issues, totalIssueCount);
 
 	if (action === Action.Replace || action === Action.ReplaceAll) {
 		await fixIssue(issues, issue, replacer, url);
@@ -119,6 +120,8 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 };
 
 export const handleIssues = async (issues: Issue[]) => {
+	totalIssueCount = issues.length;
+
 	// The issues array is modified in place, so we need to make a copy of it.
 	for (const issue of [...issues]) {
 		if (!issues.includes(issue)) {

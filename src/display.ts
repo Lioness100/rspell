@@ -3,7 +3,7 @@ import type { Issue, ProgressItem } from 'cspell';
 import inquirer from 'inquirer';
 import inquirerSuggestionPlugin from 'inquirer-prompt-suggest';
 import ora, { type Ora } from 'ora';
-import { bold, cyan, gray, green, red, underline, whiteBright, yellow } from 'colorette';
+import { bold, cyan, gray, green, greenBright, red, underline, whiteBright, yellow } from 'colorette';
 import { Action } from './constants';
 
 inquirer.registerPrompt('suggest', inquirerSuggestionPlugin);
@@ -31,7 +31,14 @@ export const centerText = (text: string, length: number, width: number) => {
 	return ' '.repeat(left) + text + ' '.repeat(right);
 };
 
-export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): Promise<[Action, string]> => {
+export const determineAction = async (
+	url: URL,
+	issue: Issue,
+	issues: Issue[],
+	totalIssueCount: number
+): Promise<[Action, string]> => {
+	const index = totalIssueCount - issues.length;
+	const progressIndicator = `${index}/${totalIssueCount} ── `;
 	const text = formatContext(issue);
 	const path = fileURLToPath(url);
 	const trace = `:${issue.row}:${issue.col}`;
@@ -39,11 +46,15 @@ export const determineAction = async (url: URL, issue: Issue, issues: Issue[]): 
 	// Create a header that displays the absolute path to the file and the line and column of the typo. This header
 	// is centered in the terminal (the width of the terminal is stored in process.stdout.columns)
 
-	const typoLocation = bold(`${whiteBright(fileURLToPath(url))}${cyan(`:${issue.row}:${issue.col}`)}`);
+	const typoLocation = bold(
+		`${greenBright(progressIndicator)}${whiteBright(fileURLToPath(url))}${cyan(`:${issue.row}:${issue.col}`)}`
+	);
 
 	const width = process.stdout.columns;
-	const typoLocationHeader = centerText(typoLocation, path.length + trace.length, width);
-	const line = '─'.repeat(width);
+	const typoLocationHeader = centerText(typoLocation, path.length + trace.length + progressIndicator.length, width);
+
+	const progress = Math.floor((index / totalIssueCount) * width);
+	const line = bold(greenBright('─'.repeat(progress)) + '─'.repeat(width - progress));
 
 	console.log(`${typoLocationHeader}\n${line}\n\n${text}\n`);
 
