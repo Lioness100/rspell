@@ -1,12 +1,12 @@
 import { fileURLToPath } from 'node:url';
 import type { Issue, ProgressItem } from 'cspell';
-import inquirer from 'inquirer';
+import { prompt, registerPrompt } from 'inquirer';
 import inquirerSuggestionPlugin from 'inquirer-prompt-suggest';
 import ora, { type Ora } from 'ora';
 import { bold, cyan, gray, green, greenBright, red, underline, whiteBright, yellow } from 'colorette';
 import { Action } from './constants';
 
-inquirer.registerPrompt('suggest', inquirerSuggestionPlugin);
+registerPrompt('suggest', inquirerSuggestionPlugin);
 
 export const highlightText = (left: string, text: string, right: string) => {
 	return `${gray(left.trimStart())}${red(underline(text))}${gray(right.trimEnd())}`;
@@ -63,7 +63,7 @@ export const determineAction = async (
 	const otherTypoInstancesCount = issues.filter((otherIssue) => otherIssue.text === issue.text).length;
 	const otherTyposInFileCount = issues.filter((otherIssue) => otherIssue.uri === issue.uri).length;
 
-	const { action } = await inquirer.prompt<{ action: Action }>({
+	const { action } = await prompt<{ action: Action }>({
 		type: 'list',
 		name: 'action',
 		message: 'Choose your action:',
@@ -85,7 +85,7 @@ export const determineAction = async (
 		return [action, ''];
 	}
 
-	const { replacer } = await inquirer.prompt<{ replacer: string }>([
+	const { replacer } = await prompt<{ replacer: string }>([
 		{
 			// `cspell` might provide suggestions for the typo. If it does, we can use the `suggest` prompt type to
 			// allow the user to select one of the suggestions by pressing tab.
