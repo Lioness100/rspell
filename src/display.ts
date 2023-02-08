@@ -1,15 +1,16 @@
 import { fileURLToPath } from 'node:url';
 import type { Issue, ProgressItem } from 'cspell';
 import { prompt, registerPrompt } from 'inquirer';
-import inquirerSuggestionPlugin from 'inquirer-prompt-suggest';
+import { default as inquirerSuggestionPlugin } from 'inquirer-prompt-suggest';
 import ora, { type Ora } from 'ora';
-import { bold, cyan, gray, green, greenBright, red, underline, whiteBright, yellow } from 'colorette';
+import { bold, cyan, dim, gray, green, greenBright, red, underline, whiteBright, yellow } from 'colorette';
 import { Action } from './constants';
 
 registerPrompt('suggest', inquirerSuggestionPlugin);
 
 export const highlightText = (left: string, text: string, right: string) => {
-	return `${gray(left.trimStart())}${red(underline(text))}${gray(right.trimEnd())}`;
+	const blueText = dim(red(text));
+	return `${gray(left.replaceAll(text, blueText))}${red(underline(text))}${gray(right.replaceAll(text, blueText))}`;
 };
 
 // Given an issue, this function will use issue.line.text to determine the 40 characters on either side of the issue
@@ -22,7 +23,7 @@ export const formatContext = (issue: Issue) => {
 	const left = issue.line.text.slice(contextL, issue.col - 1);
 	const right = issue.line.text.slice(issue.col + issue.text.length - 1, contextR);
 
-	return highlightText(left, issue.text, right);
+	return highlightText(left.trimStart(), issue.text, right.trimEnd());
 };
 
 export const centerText = (text: string, length: number, width: number) => {
