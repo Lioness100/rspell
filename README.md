@@ -47,7 +47,7 @@ Options:
   -e, --exclude <globs...>    Exclude files matching the glob pattern.
   -g, --use-gitignore         Use the .gitignore file to exclude files.
   -C, --cache                 Store the info about processed files in order to only operate on the changed ones.
-  -d, --dot                   Determine if files/directories starting with "." should be part of the glob search.
+  -d, --dot                   Include files/directories starting with "." in the glob search.
   -l, --locale <locale>       Explicitly set the locale to use for spell checking.
   -h, --help                  display help for command
 ```

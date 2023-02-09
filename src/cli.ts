@@ -39,7 +39,7 @@ Examples:
 	.option('-e, --exclude <globs...>', 'Exclude files matching the glob pattern.')
 	.option('-g, --use-gitignore', 'Use the .gitignore file to exclude files.')
 	.option('-C, --cache', 'Store the info about processed files in order to only operate on the changed ones.')
-	.option('-d, --dot', 'Determine if files/directories starting with "." should be part of the glob search.')
+	.option('-d, --dot', 'Include files/directories starting with "." in the glob search.')
 	.option('-l, --locale <locale>', 'Explicitly set the locale to use for spell checking.');
 
 program.parse();
