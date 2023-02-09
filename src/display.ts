@@ -106,7 +106,7 @@ export const determineAction = async (
 };
 
 // This function is used to clear the current terminal screen. This is used before displaying a new typo for more
-// seemless navigation.
+// seamless navigation.
 export const resetDisplay = () => {
 	process.stdout.write('\u001B[2J\u001B[0;0H');
 };

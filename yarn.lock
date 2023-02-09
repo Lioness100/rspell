@@ -1165,6 +1165,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"application-config-path@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "application-config-path@npm:1.0.0"
+  checksum: 083012425681c533776d22a59f4ce09539349c06c64d2733570a29162f41ff02442b75b560de2408c0866a1a16a01d5f7c21dd04a6704dc17a7403999688d968
+  languageName: node
+  linkType: hard
+
 "aproba@npm:^1.0.3 || ^2.0.0":
   version: 2.0.0
   resolution: "aproba@npm:2.0.0"
@@ -4949,6 +4956,7 @@ __metadata:
     "@lioness100/configs": ^1.0.22
     "@types/inquirer": ^8.2.5
     "@types/node": ^18.11.19
+    application-config-path: ^1.0.0
     colorette: ^2.0.19
     commander: ^10.0.0
     cspell: ^6.21.0

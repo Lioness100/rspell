@@ -52,7 +52,9 @@ Options:
   -h, --help                  display help for command
 ```
 
-Since `rspell` is built on top of `cspell`, you can customize the behavior of the tool by creating a [`cspell.json` file](https://cspell.org/configuration/).
+Since `rspell` is built on top of `cspell`, you can customize the behavior of the tool by creating a [`cspell.json`
+file](https://cspell.org/configuration/). If you don't have one, `rspell` will automatically create a config file for
+you and update the list of ignored words appropriately as you use the CLI. 
 
 ## Contributors ✨
 

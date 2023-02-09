@@ -4,7 +4,7 @@ import { program } from 'commander';
 import type { Issue } from 'cspell';
 import { lint } from 'cspell';
 import { reportErrors, reportSuccess, resetDisplay, showProgress, showStartupMessage, stopSpinner } from './display';
-import { handleIssues } from './handleIssue';
+import { findConfig, handleIssues } from './handleIssue';
 
 interface CLIOptions {
 	cache?: boolean;
@@ -51,6 +51,8 @@ const globs = program.processedArgs[0];
 showStartupMessage(globs);
 
 const start = async () => {
+	const configPath = await findConfig(options.config);
+
 	const {
 		issues: issueCount,
 		files,
@@ -59,7 +61,7 @@ const start = async () => {
 	} = await lint(
 		globs,
 		{
-			config: options.config,
+			config: configPath,
 			exclude: options.exclude,
 			gitignore: options.useGitignore,
 			cache: options.cache,
