@@ -27,7 +27,7 @@
 		"cspell": "^6.21.0",
 		"inquirer": "^8.2.5",
 		"inquirer-prompt-suggest": "^0.1.0",
-		"ora": "^5.4.1"
+		"nanospinner": "^1.1.0"
 	},
 	"devDependencies": {
 		"@lioness100/configs": "^1.0.22",

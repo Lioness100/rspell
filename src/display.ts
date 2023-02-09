@@ -2,8 +2,8 @@ import { fileURLToPath } from 'node:url';
 import type { Issue, ProgressItem } from 'cspell';
 import { prompt, registerPrompt } from 'inquirer';
 import { default as inquirerSuggestionPlugin } from 'inquirer-prompt-suggest';
-import ora, { type Ora } from 'ora';
 import { bold, cyan, dim, gray, green, greenBright, red, underline, whiteBright, yellow } from 'colorette';
+import { type Spinner, createSpinner } from 'nanospinner';
 import { Action } from './constants';
 
 registerPrompt('suggest', inquirerSuggestionPlugin);
@@ -111,34 +111,25 @@ export const resetDisplay = () => {
 	process.stdout.write('\u001B[2J\u001B[0;0H');
 };
 
-let spinner: Ora;
-const setSpinnerText = (text: string) => {
-	if (spinner) {
-		spinner.text = text;
-	} else {
-		spinner = ora(text).start();
-	}
-};
-
 export const showStartupMessage = (globs: string[]) => {
-	setSpinnerText(`Finding files matching ${cyan(globs.join(', '))}`);
+	console.log(`\nFinding files matching ${cyan(globs.join(', '))}`);
 };
 
+let spinner: Spinner;
 export const stopSpinner = () => {
 	spinner.stop();
 };
 
 export const showProgress = (item: ProgressItem) => {
-	if (item.type === 'ProgressFileBegin') {
-		setSpinnerText(`Checking ${cyan(item.filename)} (${item.fileNum}/${item.fileCount})`);
-	} else {
-		const timeDisplay = `${item.elapsedTimeMs ? Math.trunc(item.elapsedTimeMs) : '[unknown]'}ms`;
-		const errorDisplay = item.numErrors ? ` (${red(item.numErrors)} typos)` : '';
+	if (item.type !== 'ProgressFileBegin') {
+		return;
+	}
 
-		spinner.stopAndPersist({
-			symbol: item.numErrors ? red('❌') : green('✔'),
-			text: `Checked ${cyan(item.filename)} in ${timeDisplay}${errorDisplay}`
-		});
+	const text = `Checking ${cyan(item.filename)} (${item.fileNum}/${item.fileCount})`;
+	if (spinner) {
+		spinner.update({ text });
+	} else {
+		spinner = createSpinner(text, { color: 'cyan' }).start();
 	}
 };
 
@@ -149,8 +140,6 @@ export const reportErrors = (errors: number) => {
 export const reportSuccess = (hasQuit: boolean, issues: number, files: number, filesWithIssues: number) => {
 	const color = hasQuit ? yellow : green;
 	const adverb = hasQuit ? 'Partially' : 'Successfully';
-
-	stopSpinner();
 
 	console.log(
 		`\n${adverb} resolved ${color(issues)} issues in ${color(`${filesWithIssues}/${files}`)} matched files!`

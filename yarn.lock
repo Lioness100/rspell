@@ -4240,6 +4240,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nanospinner@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "nanospinner@npm:1.1.0"
+  dependencies:
+    picocolors: ^1.0.0
+  checksum: 797f0a7c8b053d6fb5188d73e63bab44dec97ff0e7b67ac3d55e9356c6fe002f5af691a9d1232ca086e1fb19301d11c979dc5b0c56e6700004a96c19dfded8f0
+  languageName: node
+  linkType: hard
+
 "natural-compare-lite@npm:^1.4.0":
   version: 1.4.0
   resolution: "natural-compare-lite@npm:1.4.0"
@@ -4947,7 +4956,7 @@ __metadata:
     eslint: ^8.33.0
     inquirer: ^8.2.5
     inquirer-prompt-suggest: ^0.1.0
-    ora: ^5.4.1
+    nanospinner: ^1.1.0
     prettier: ^2.8.3
     tsup: ^6.5.0
     typescript: ^4.9.5

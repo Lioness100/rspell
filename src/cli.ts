@@ -3,7 +3,7 @@ import { red } from 'colorette';
 import { program } from 'commander';
 import type { Issue } from 'cspell';
 import { lint } from 'cspell';
-import { reportErrors, reportSuccess, resetDisplay, showProgress, showStartupMessage } from './display';
+import { reportErrors, reportSuccess, resetDisplay, showProgress, showStartupMessage, stopSpinner } from './display';
 import { handleIssues } from './handleIssue';
 
 interface CLIOptions {
@@ -74,6 +74,8 @@ const start = async () => {
 			issue: (issue) => issues.push(issue)
 		}
 	);
+
+	stopSpinner();
 
 	if (errors) {
 		reportErrors(errors);
