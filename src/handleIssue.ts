@@ -1,6 +1,7 @@
 /* eslint-disable require-atomic-updates */
 /* eslint-disable unicorn/no-useless-spread */
 import { readFile, writeFile } from 'node:fs/promises';
+import { extname } from 'node:path';
 import type { CSpellUserSettings, Issue } from 'cspell';
 // eslint-disable-next-line import/no-relative-packages
 import { readConfig } from '../node_modules/cspell/dist/util/fileHelper';
@@ -70,7 +71,7 @@ export const fixIssue = async (issues: Issue[], issue: Issue, replacer: string, 
 	await writeChangeToFile(url, issue, replacer).catch(() => null);
 };
 
-let cachedConfig: { path: string; settings: CSpellUserSettings | { cspell: CSpellUserSettings } };
+let cachedConfig: { path: string; settings: CSpellUserSettings | { cspell: CSpellUserSettings } } | undefined;
 
 export const findConfig = async (config?: string) => {
 	// Try to locate a config file in the current working directory, or with the `config` option if it was provided.
@@ -81,6 +82,12 @@ export const findConfig = async (config?: string) => {
 		configInfo.source === 'None found'
 			? (await import('application-config-path')).default('cspell.json')
 			: configInfo.source;
+
+	// Only JSON files are supported to prevent more dependencies for yml parsing. If the config file is not a JSON
+	// file, it can still be used, but it won't be updated with new ignored words.
+	if (extname(path) !== '.json') {
+		return path;
+	}
 
 	// Don't use the object provided by `readConfig`, because it normalizes the config file, which we don't want.
 	const settings = await readFile(path, 'utf8').catch(async () => {
@@ -93,17 +100,19 @@ export const findConfig = async (config?: string) => {
 };
 
 export const addIgnoreWordToSettings = async (text: string) => {
-	// Reload the config file, in case it was changed.
-	cachedConfig.settings = JSON.parse(await readFile(cachedConfig.path, 'utf8'));
+	if (cachedConfig) {
+		// Reload the config file, in case it was changed.
+		cachedConfig.settings = JSON.parse(await readFile(cachedConfig.path, 'utf8'));
 
-	// If the config is in a package.json:
-	if ('cspell' in cachedConfig.settings) {
-		(cachedConfig.settings.cspell.ignoreWords ??= []).push(text);
-	} else {
-		(cachedConfig.settings.ignoreWords ??= []).push(text);
+		// If the config is in a package.json:
+		if ('cspell' in cachedConfig.settings) {
+			(cachedConfig.settings.cspell.ignoreWords ??= []).push(text);
+		} else {
+			(cachedConfig.settings.ignoreWords ??= []).push(text);
+		}
+
+		await writeFile(cachedConfig.path, JSON.stringify(cachedConfig.settings, null, 4));
 	}
-
-	await writeFile(cachedConfig.path, JSON.stringify(cachedConfig.settings, null, 4));
 };
 
 export const performSideEffects = async (issues: Issue[], issue: Issue, action: Action, replacer: string, url: URL) => {
