@@ -10,7 +10,7 @@ registerPrompt('suggest', inquirerSuggestionPlugin);
 
 export const highlightText = (left: string, text: string, right: string) => {
 	const blueText = dim(red(text));
-	return `${gray(left.replaceAll(text, blueText))}${red(underline(text))}${gray(right.replaceAll(text, blueText))}`;
+	return gray(left.replaceAll(text, blueText)) + red(underline(text)) + gray(right.replaceAll(text, blueText));
 };
 
 // Given an issue, this function will use issue.line.text to determine the 40 characters on either side of the issue
@@ -27,9 +27,13 @@ export const formatContext = (issue: Issue) => {
 };
 
 export const centerText = (text: string, length: number, width: number) => {
-	const left = Math.floor((width - length) / 2);
-	const right = width - length - left;
-	return ' '.repeat(left) + text + ' '.repeat(right);
+	if (length < width) {
+		const left = Math.floor((width - length) / 2);
+		const right = width - length - left;
+		return ' '.repeat(left) + text + ' '.repeat(right);
+	}
+
+	return text;
 };
 
 export const determineAction = async (
@@ -48,7 +52,7 @@ export const determineAction = async (
 	// is centered in the terminal (the width of the terminal is stored in process.stdout.columns)
 
 	const typoLocation = bold(
-		`${greenBright(progressIndicator)}${whiteBright(fileURLToPath(url))}${cyan(`:${issue.row}:${issue.col}`)}`
+		greenBright(progressIndicator) + whiteBright(fileURLToPath(url)) + cyan(`:${issue.row}:${issue.col}`)
 	);
 
 	const width = process.stdout.columns;
@@ -56,7 +60,7 @@ export const determineAction = async (
 
 	const progress = Math.floor((index / totalIssueCount) * width);
 
-	const line = bold(greenBright('─'.repeat(Math.max(0, progress))) + '─'.repeat(Math.max(0, width - progress)));
+	const line = bold(greenBright('─'.repeat(progress)) + '─'.repeat(width - progress));
 
 	console.log(`${typoLocationHeader}\n${line}\n\n${text}\n`);
 
