@@ -13,7 +13,6 @@ export const writeChangeToFile = async (url: URL, issue: Issue, replacer: string
 	// `issue.offset` is the index of the first character of the issue. With this, we slice everything in the file
 	// before the text, then add the replacer, then add everything after the text.
 	const newFile = file.slice(0, issue.offset) + replacer + file.slice(issue.offset + issue.text.length);
-
 	await writeFile(url, newFile);
 };
 
@@ -68,7 +67,7 @@ export const updateFutureIssues = (issue: Issue, replacer: string, issues: Issue
 
 export const fixIssue = async (issues: Issue[], issue: Issue, replacer: string, url: URL) => {
 	updateFutureIssues(issue, replacer, issues);
-	await writeChangeToFile(url, issue, replacer);
+	await writeChangeToFile(url, issue, replacer).catch(() => null);
 };
 
 let cachedConfig: { path: string; settings: CSpellUserSettings | { cspell: CSpellUserSettings } };
@@ -94,21 +93,17 @@ export const findConfig = async (config?: string) => {
 };
 
 export const addIgnoreWordToSettings = async (text: string) => {
-	try {
-		// Reload the config file, in case it was changed.
-		cachedConfig.settings = JSON.parse(await readFile(cachedConfig.path, 'utf8'));
+	// Reload the config file, in case it was changed.
+	cachedConfig.settings = JSON.parse(await readFile(cachedConfig.path, 'utf8'));
 
-		// If the config is in a package.json:
-		if ('cspell' in cachedConfig.settings) {
-			(cachedConfig.settings.cspell.ignoreWords ??= []).push(text);
-		} else {
-			(cachedConfig.settings.ignoreWords ??= []).push(text);
-		}
-
-		await writeFile(cachedConfig.path, JSON.stringify(cachedConfig.settings, null, 4));
-	} catch {
-		// If we can't add the word to the config file, we don't want to crash the program.
+	// If the config is in a package.json:
+	if ('cspell' in cachedConfig.settings) {
+		(cachedConfig.settings.cspell.ignoreWords ??= []).push(text);
+	} else {
+		(cachedConfig.settings.ignoreWords ??= []).push(text);
 	}
+
+	await writeFile(cachedConfig.path, JSON.stringify(cachedConfig.settings, null, 4));
 };
 
 export const performSideEffects = async (issues: Issue[], issue: Issue, action: Action, replacer: string, url: URL) => {
@@ -159,7 +154,7 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 		await performSideEffects(issues, issue, action, replacer, url);
 
 		if (action === Action.IgnoreAll) {
-			await addIgnoreWordToSettings(issue.text);
+			await addIgnoreWordToSettings(issue.text).catch(() => null);
 		}
 	}
 
