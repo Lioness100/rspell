@@ -3,8 +3,9 @@ import { red } from 'colorette';
 import { program } from 'commander';
 import type { Issue } from 'cspell';
 import { lint } from 'cspell';
+import { findConfig } from './config';
 import { reportErrors, reportSuccess, resetDisplay, showProgress, showStartupMessage, stopSpinner } from './display';
-import { findConfig, handleIssues } from './handleIssue';
+import { handleIssues } from './handleIssue';
 
 interface CLIOptions {
 	cache?: boolean;
