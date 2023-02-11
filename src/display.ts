@@ -4,7 +4,7 @@ import { prompt, registerPrompt } from 'inquirer';
 import { default as inquirerSuggestionPlugin } from 'inquirer-prompt-suggest';
 import { bold, cyan, dim, gray, green, greenBright, red, underline, whiteBright, yellow } from 'colorette';
 import { type Spinner, createSpinner } from 'nanospinner';
-import { Action } from './constants';
+import { Action, previousState } from './shared';
 
 registerPrompt('suggest', inquirerSuggestionPlugin);
 
@@ -82,6 +82,15 @@ export const determineAction = async (
 				  ]
 				: []),
 			{ name: `Skip File (${cyan(otherTyposInFileCount + 1)})`, value: Action.SkipFile },
+			// The explicit undefined check is needed because Action.Ignore is 0, which is falsy.
+			...(previousState.action !== undefined && previousState.action !== Action.UndoLastAction
+				? [
+						{
+							name: yellow('Undo Last Action'),
+							value: Action.UndoLastAction
+						}
+				  ]
+				: []),
 			{ name: red('Quit'), value: Action.Quit }
 		]
 	});
@@ -119,9 +128,9 @@ export const showStartupMessage = (globs: string[]) => {
 	console.log(`\nFinding files matching ${cyan(globs.join(', '))}`);
 };
 
-let spinner: Spinner;
+let spinner: Spinner | undefined;
 export const stopSpinner = () => {
-	spinner.stop();
+	spinner?.stop();
 };
 
 export const showProgress = (item: ProgressItem) => {

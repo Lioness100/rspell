@@ -2,7 +2,7 @@ import { writeFile } from 'node:fs/promises';
 import { vi, afterEach, describe, test, expect } from 'vitest';
 import { handleIssues } from '../src/handleIssue';
 import { determineAction, formatContext } from '../src/display';
-import { Action } from '../src/constants';
+import { Action } from '../src/shared';
 import { allTypoSets } from './fixtures/data';
 import { sampleReplacer } from './mocks/issue';
 

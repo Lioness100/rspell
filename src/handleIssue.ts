@@ -1,10 +1,12 @@
-/* eslint-disable require-atomic-updates */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable unicorn/no-useless-spread */
 import { readFile, writeFile } from 'node:fs/promises';
 import type { Issue } from 'cspell';
 import { determineAction, resetDisplay } from './display';
-import { Action } from './constants';
-import { addIgnoreWordToSettings } from './config';
+import { Action, previousState } from './shared';
+import { addIgnoreWordToSettings, writeToSettings } from './config';
+
+let totalIssueCount = 0;
 
 export const writeChangeToFile = async (url: URL, issue: Issue, replacer: string) => {
 	const file = await readFile(url, 'utf8');
@@ -65,6 +67,7 @@ export const updateFutureIssues = (issue: Issue, replacer: string, issues: Issue
 };
 
 export const fixIssue = async (issues: Issue[], issue: Issue, replacer: string, url: URL) => {
+	previousState.resolvedIssues.push(issue);
 	updateFutureIssues(issue, replacer, issues);
 	await writeChangeToFile(url, issue, replacer).catch(() => null);
 };
@@ -98,7 +101,26 @@ export const performSideEffects = async (issues: Issue[], issue: Issue, action: 
 	}
 };
 
-let totalIssueCount = 0;
+export const restoreState = async (issues: Issue[]) => {
+	const { config, resolvedIssues, issue: previousIssue, issues: previousIssues, replacer } = previousState;
+
+	if (config) {
+		await writeToSettings(config).catch(() => null);
+	}
+
+	if (replacer) {
+		for (const resolvedIssue of resolvedIssues) {
+			// Replace the new replacer with the old text instead of the other way around.
+			const newReplacer = resolvedIssue.text;
+			resolvedIssue.text = replacer;
+			await writeChangeToFile(new URL(resolvedIssue.uri!), resolvedIssue, newReplacer).catch(() => null);
+		}
+	}
+
+	// Edit the entire issues array in place, so that the reference is the same.
+	issues.splice(0, issues.length, ...previousIssues);
+	return previousIssue;
+};
 
 export const handleIssue = async (issues: Issue[], issue: Issue) => {
 	if (!issue.uri) {
@@ -107,6 +129,31 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 
 	const url = new URL(issue.uri);
 	const [action, replacer] = await determineAction(url, issue, issues, totalIssueCount);
+
+	previousState.action = action;
+
+	if (action === Action.UndoLastAction) {
+		const lastIssue = await restoreState(issues);
+
+		// Handle the last issue again, and then come back to the current one.
+		resetDisplay();
+
+		const hasQuit = await handleIssue(issues, lastIssue);
+		if (hasQuit) {
+			return true;
+		}
+
+		return handleIssues(issues);
+	}
+
+	// Set the initial state
+	Object.assign(previousState, {
+		replacer,
+		issue,
+		issues: issues.map((issue) => ({ ...issue, line: { ...issue.line } })),
+		resolvedIssues: [],
+		config: undefined
+	} as Omit<typeof previousState, 'action'>);
 
 	if (action === Action.Replace || action === Action.ReplaceAll) {
 		await fixIssue(issues, issue, replacer, url);
@@ -126,7 +173,7 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 };
 
 export const handleIssues = async (issues: Issue[]) => {
-	totalIssueCount = issues.length;
+	totalIssueCount ||= issues.length;
 
 	// The issues array is modified in place, so we need to make a copy of it.
 	for (const issue of [...issues]) {
@@ -135,7 +182,6 @@ export const handleIssues = async (issues: Issue[]) => {
 		}
 
 		issues.splice(issues.indexOf(issue), 1);
-
 		const hasQuit = await handleIssue(issues, issue);
 
 		// If the user has quit, exit early.
