@@ -56,22 +56,21 @@ Since `rspell` is built on top of `cspell`, you can customize the behavior of th
 file](https://cspell.org/configuration/). If you don't have one, `rspell` will automatically create a config file for
 you and update the list of ignored words appropriately as you use the CLI. 
 
-## Contributors ✨
+## 💡 Featured PRs using `rspell`
 
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/Lioness100"><img src="https://avatars.githubusercontent.com/u/65814829?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Lioness100</b></sub></a><br /><a href="https://github.com/Lioness100/sapphire-template/issues?q=author%3ALioness100" title="Bug reports">🐛</a> <a href="https://github.com/Lioness100/sapphire-template/commits?author=Lioness100" title="Code">💻</a> <a href="https://github.com/Lioness100/sapphire-template/commits?author=Lioness100" title="Documentation">📖</a> <a href="#ideas-Lioness100" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-Lioness100" title="Maintenance">🚧</a> <a href="#projectManagement-Lioness100" title="Project Management">📆</a> <a href="https://github.com/Lioness100/sapphire-template/commits?author=Lioness100" title="Tests">⚠️</a></td>
-  </tr>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+- https://github.com/Byron/gitoxide/pull/724 (408 typos)
+- https://github.com/nextauthjs/next-auth/pull/6701 (63 typos)
+- https://github.com/nestjs/nest/pull/11096 (56 typos)
+- https://github.com/vitest-dev/vitest/pull/2815 (48 typos)
+- https://github.com/TheAlgorithms/JavaScript/pull/1283 (47 typos)
+- https://github.com/prisma/prisma/pull/17874 (43 typos)
+- https://github.com/trpc/trpc/pull/3735 (40 typos)
+- https://github.com/reactjs/reactjs.org/pull/5586 (35 typos)
+- https://github.com/chakra-ui/chakra-ui/pull/7340 (16 typos)
+- https://github.com/nestjs/docs.nestjs.com/pull/2622 (14 typos)
+- https://github.com/eslint/eslint/pull/16884 (13 typos)
+- https://github.com/vuejs/core/pull/7693 (9 typos)
+- https://github.com/sveltejs/svelte/pull/8257 (9 typos)
+- https://github.com/vitejs/vite/pull/12032 (8 typos)
+- https://github.com/rust-lang-nursery/rust-cookbook/pull/684 (7 typos)
+- https://github.com/arc53/DocsGPT/pull/36 (5 typos)
