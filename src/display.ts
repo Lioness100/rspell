@@ -87,27 +87,12 @@ export const determineAction = async (
 		choices: [
 			{ name: 'Ignore', value: Action.Ignore },
 			{ name: 'Replace', value: Action.Replace },
-			...(otherTypoInstancesCount
-				? [
-						{
-							name: `Ignore All Occurrences (${cyan(otherTypoInstancesCount + 1)})`,
-							value: Action.IgnoreAll
-						},
-						{
-							name: `Replace All Occurrences (${cyan(otherTypoInstancesCount + 1)})`,
-							value: Action.ReplaceAll
-						}
-				  ]
-				: []),
+			{ name: `Ignore All Occurrences (${cyan(otherTypoInstancesCount + 1)})`, value: Action.IgnoreAll },
+			{ name: `Replace All Occurrences (${cyan(otherTypoInstancesCount + 1)})`, value: Action.ReplaceAll },
 			{ name: `Skip File (${cyan(otherTyposInFileCount + 1)})`, value: Action.SkipFile },
 			// The explicit undefined check is needed because Action.Ignore is 0, which is falsy.
 			...(previousState.action !== undefined && previousState.action !== Action.UndoLastAction
-				? [
-						{
-							name: yellowBright('Undo Last Action'),
-							value: Action.UndoLastAction
-						}
-				  ]
+				? [{ name: yellowBright('Undo Last Action'), value: Action.UndoLastAction }]
 				: []),
 			{ name: red('Quit'), value: Action.Quit }
 		]
