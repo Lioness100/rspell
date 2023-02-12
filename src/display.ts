@@ -2,7 +2,19 @@ import { fileURLToPath } from 'node:url';
 import type { Issue, ProgressItem } from 'cspell';
 import { prompt, registerPrompt } from 'inquirer';
 import { default as inquirerSuggestionPlugin } from 'inquirer-prompt-suggest';
-import { bold, cyan, dim, gray, green, greenBright, red, underline, whiteBright, yellow } from 'colorette';
+import {
+	bold,
+	cyan,
+	dim,
+	gray,
+	green,
+	greenBright,
+	red,
+	underline,
+	whiteBright,
+	yellow,
+	yellowBright
+} from 'colorette';
 import { type Spinner, createSpinner } from 'nanospinner';
 import { Action, previousState } from './shared';
 
@@ -77,8 +89,14 @@ export const determineAction = async (
 			{ name: 'Replace', value: Action.Replace },
 			...(otherTypoInstancesCount
 				? [
-						{ name: `Ignore All (${cyan(otherTypoInstancesCount + 1)})`, value: Action.IgnoreAll },
-						{ name: `Replace All (${cyan(otherTypoInstancesCount + 1)})`, value: Action.ReplaceAll }
+						{
+							name: `Ignore All Occurrences (${cyan(otherTypoInstancesCount + 1)})`,
+							value: Action.IgnoreAll
+						},
+						{
+							name: `Replace All Occurrences (${cyan(otherTypoInstancesCount + 1)})`,
+							value: Action.ReplaceAll
+						}
 				  ]
 				: []),
 			{ name: `Skip File (${cyan(otherTyposInFileCount + 1)})`, value: Action.SkipFile },
@@ -86,7 +104,7 @@ export const determineAction = async (
 			...(previousState.action !== undefined && previousState.action !== Action.UndoLastAction
 				? [
 						{
-							name: yellow('Undo Last Action'),
+							name: yellowBright('Undo Last Action'),
 							value: Action.UndoLastAction
 						}
 				  ]
