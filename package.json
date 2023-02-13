@@ -1,6 +1,6 @@
 {
 	"name": "rspell",
-	"version": "1.6.0",
+	"version": "1.6.1",
 	"description": "📝 Find and fix all your project's typos with a single command!",
 	"main": "dist/cli.js",
 	"repository": "https://github.com/Lioness100/rspell",
