@@ -102,15 +102,16 @@ export const determineAction = async (
 		return [action, ''];
 	}
 
+	const suggestions = issue.suggestionsEx?.map((suggestion) => suggestion.wordAdjustedToMatchCase);
 	const { replacer } = await prompt<{ replacer: string }>([
 		{
 			// `cspell` might provide suggestions for the typo. If it does, we can use the `suggest` prompt type to
 			// allow the user to select one of the suggestions by pressing tab.
-			type: issue.suggestions?.length ? 'suggest' : 'input',
+			type: suggestions?.length ? 'suggest' : 'input',
 			name: 'replacer',
 			message: 'What should the typo be replaced with?',
 			// Inquirer-prompt-suggest seems to display the first suggestion last
-			suggestions: issue.suggestions?.length ? [issue.suggestions.pop(), ...issue.suggestions] : []
+			suggestions: suggestions?.length ? [suggestions.pop(), ...suggestions] : []
 		}
 	]);
 

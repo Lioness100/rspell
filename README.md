@@ -58,7 +58,6 @@ you and update the list of ignored words appropriately as you use the CLI.
 
 ## 💡 Featured PRs using `rspell`
 
-- https://github.com/botlabs-gg/yagpdb/pull/1438 (910 typos)
 - https://github.com/Byron/gitoxide/pull/724 (408 typos)
 - https://github.com/nextauthjs/next-auth/pull/6701 (63 typos)
 - https://github.com/nestjs/nest/pull/11096 (56 typos)
