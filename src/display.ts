@@ -102,7 +102,7 @@ export const determineAction = async (
 		return [action, ''];
 	}
 
-	const suggestions = issue.suggestionsEx?.map((suggestion) => suggestion.wordAdjustedToMatchCase);
+	const suggestions = issue.suggestionsEx?.map((suggestion) => suggestion.wordAdjustedToMatchCase ?? suggestion.word);
 	const { replacer } = await prompt<{ replacer: string }>([
 		{
 			// `cspell` might provide suggestions for the typo. If it does, we can use the `suggest` prompt type to
@@ -125,7 +125,7 @@ export const determineAction = async (
 // This function is used to clear the current terminal screen. This is used before displaying a new typo for more
 // seamless navigation.
 export const resetDisplay = () => {
-	process.stdout.write('\u001B[2J\u001B[0;0H');
+	// Process.stdout.write('\u001B[2J\u001B[0;0H');
 };
 
 export const showStartupMessage = (globs: string[]) => {
