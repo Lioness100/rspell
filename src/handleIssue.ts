@@ -149,7 +149,7 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 	// Set the initial state
 	Object.assign(previousState, {
 		replacer,
-		issue,
+		issue: { ...issue, line: { ...issue.line } },
 		issues: issues.map((issue) => ({ ...issue, line: { ...issue.line } })),
 		resolvedIssues: [],
 		config: undefined
