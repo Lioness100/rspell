@@ -6,7 +6,7 @@ export default defineConfig((options) => ({
 	minify: !options.watch,
 	entry: ['src/cli.ts'],
 	format: ['cjs'],
-	plugins: [esbuildPluginVersionInjector()],
+	esbuildPlugins: [esbuildPluginVersionInjector()],
 	target: 'node16',
 	sourcemap: true,
 	// Cspell/util/fileHelper has to be imported relatively because it is not exported in the package.json. However,

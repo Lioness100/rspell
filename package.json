@@ -31,7 +31,7 @@
 		"nanospinner": "^1.1.0"
 	},
 	"devDependencies": {
-		"@lioness100/configs": "^1.0.22",
+		"@lioness100/configs": "^1.0.23",
 		"@types/inquirer": "^8.2.5",
 		"@types/node": "^18.13.0",
 		"esbuild-plugin-version-injector": "^1.0.3",
