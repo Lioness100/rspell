@@ -63,6 +63,7 @@ you and update the list of ignored words appropriately as you use the CLI.
 - https://github.com/nestjs/nest/pull/11096 (56 typos)
 - https://github.com/vitest-dev/vitest/pull/2815 (48 typos)
 - https://github.com/TheAlgorithms/JavaScript/pull/1283 (47 typos)
+- https://github.com/Cog-Creators/Red-DiscordBot/pull/5989 (43 typos)
 - https://github.com/prisma/prisma/pull/17874 (43 typos)
 - https://github.com/trpc/trpc/pull/3735 (40 typos)
 - https://github.com/reactjs/reactjs.org/pull/5586 (35 typos)
