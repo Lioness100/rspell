@@ -3,6 +3,7 @@ import { vi, afterEach, describe, test, expect } from 'vitest';
 import { handleIssues } from '../src/handleIssue';
 import { determineAction, formatContext } from '../src/display';
 import { Action } from '../src/shared';
+import { findConfig } from '../src/config';
 import { allTypoSets } from './fixtures/data';
 import { sampleReplacer } from './mocks/issue';
 
@@ -53,5 +54,15 @@ describe.each(allTypoSets)('%s', (name, data) => {
 		const contextDisplays = displayedIssues.map((issue) => formatContext(issue));
 
 		expect(contextDisplays, name).toMatchObject(data.displays);
+	});
+});
+
+describe('findConfig', () => {
+	test("should return the input if it's a valid path", async () => {
+		const input = 'local_cspell.json';
+
+		const config = await findConfig(input);
+
+		expect(config).toBe(input);
 	});
 });
