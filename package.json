@@ -26,6 +26,7 @@
 		"colorette": "^2.0.19",
 		"commander": "^10.0.0",
 		"cspell": "^6.24.0",
+		"cspell-lib": "^6.26.3",
 		"inquirer": "^8.2.5",
 		"inquirer-prompt-suggest": "^0.1.0",
 		"nanospinner": "^1.1.0"
