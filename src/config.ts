@@ -1,21 +1,18 @@
 import { extname } from 'node:path';
 import { readFile, writeFile } from 'node:fs/promises';
 import type { CSpellSettings } from 'cspell';
+import { searchForConfig } from 'cspell-lib';
 // eslint-disable-next-line import/no-relative-packages
-import { readConfig } from '../node_modules/cspell/dist/util/fileHelper';
 import { previousState } from './shared';
 
 let configPath: string | undefined;
 
 export const findConfig = async (config?: string) => {
 	// Try to locate a config file in the current working directory, or with the `config` option if it was provided.
-	const configInfo = await readConfig(config, process.cwd());
+	const configSource = config ?? (await searchForConfig(process.cwd()))?.__importRef?.filename;
 
 	// If no config file was found, use/create a config file in the user's configuration directory (platform dependent).
-	const path =
-		configInfo.source === 'None found'
-			? (await import('application-config-path')).default('cspell.json')
-			: configInfo.source;
+	const path = configSource ?? (await import('application-config-path')).default('cspell.json');
 
 	// Only JSON files are supported to prevent more dependencies for yml parsing. If the config file is not a JSON
 	// file, it can still be used, but it won't be updated with new ignored words.
