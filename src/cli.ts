@@ -4,7 +4,15 @@ import { program } from 'commander';
 import type { Issue } from 'cspell';
 import { lint } from 'cspell';
 import { findConfig } from './config';
-import { reportErrors, reportSuccess, resetDisplay, showProgress, showStartupMessage, stopSpinner } from './display';
+import {
+	reportErrors,
+	reportSuccess,
+	resetDisplay,
+	showConfigurationFilePath,
+	showProgress,
+	showStartupMessage,
+	stopSpinner
+} from './display';
 import { handleIssues } from './handleIssue';
 
 interface CLIOptions {
@@ -53,6 +61,7 @@ showStartupMessage(globs);
 
 const start = async () => {
 	const configPath = await findConfig(options.config);
+	showConfigurationFilePath(configPath);
 
 	const {
 		issues: issueCount,

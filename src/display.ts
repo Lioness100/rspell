@@ -132,6 +132,10 @@ export const showStartupMessage = (globs: string[]) => {
 	console.log(`\nFinding files matching ${cyan(globs.join(', '))}`);
 };
 
+export const showConfigurationFilePath = (path: string) => {
+	console.log(`Using configuration from ${cyan(path)}\n`);
+};
+
 let spinner: Spinner | undefined;
 export const stopSpinner = () => {
 	spinner?.stop();
