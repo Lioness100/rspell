@@ -1,7 +1,10 @@
+import fs from 'node:fs';
+import { join } from 'node:path';
 import { writeFile } from 'node:fs/promises';
 import { vi, afterEach, describe, test, expect } from 'vitest';
 import { handleIssues } from '../src/handleIssue';
 import { determineAction, formatContext } from '../src/display';
+import { findConfig } from '../src/config';
 import { Action } from '../src/shared';
 import { allTypoSets } from './fixtures/data';
 import { sampleReplacer } from './mocks/issue';
@@ -53,5 +56,27 @@ describe.each(allTypoSets)('%s', (name, data) => {
 		const contextDisplays = displayedIssues.map((issue) => formatContext(issue));
 
 		expect(contextDisplays, name).toMatchObject(data.displays);
+	});
+});
+
+describe('findConfig', () => {
+	test('should find a mock config file in working directory', async () => {
+		const readFileSpy = vi.spyOn<typeof fs, 'readFile'>(fs, 'readFile');
+
+		readFileSpy.mockImplementation(((
+			path: string,
+			_encoding: any,
+			callback: (err: NodeJS.ErrnoException | null, data: string) => void
+		) => {
+			if (path === join(process.cwd(), 'cspell.json')) {
+				callback(null, '{}');
+			} else {
+				callback(null, '');
+			}
+		}) as typeof fs.readFile);
+
+		const config = await findConfig();
+
+		expect(config).toBe(join(process.cwd(), 'cspell.json'));
 	});
 });
