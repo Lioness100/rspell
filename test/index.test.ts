@@ -4,7 +4,7 @@ import { writeFile } from 'node:fs/promises';
 import { vi, afterEach, describe, test, expect } from 'vitest';
 import { handleIssues } from '../src/handleIssue';
 import { determineAction, formatContext } from '../src/display';
-import { findConfig } from '../src/config';
+import { findOrCreateConfig } from '../src/config';
 import { Action } from '../src/shared';
 import { allTypoSets } from './fixtures/data';
 import { sampleReplacer } from './mocks/issue';
@@ -63,11 +63,7 @@ describe('findConfig', () => {
 	test('should find a mock config file in working directory', async () => {
 		const readFileSpy = vi.spyOn<typeof fs, 'readFile'>(fs, 'readFile');
 
-		readFileSpy.mockImplementation(((
-			path: string,
-			_encoding: any,
-			callback: (err: NodeJS.ErrnoException | null, data: string) => void
-		) => {
+		readFileSpy.mockImplementation(((path: string, _encoding: any, callback: (err: null, data: string) => void) => {
 			if (path === join(process.cwd(), 'cspell.json')) {
 				callback(null, '{}');
 			} else {
@@ -75,7 +71,7 @@ describe('findConfig', () => {
 			}
 		}) as typeof fs.readFile);
 
-		const config = await findConfig();
+		const config = await findOrCreateConfig();
 
 		expect(config).toBe(join(process.cwd(), 'cspell.json'));
 	});

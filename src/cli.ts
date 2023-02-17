@@ -3,7 +3,7 @@ import { red } from 'colorette';
 import { program } from 'commander';
 import type { Issue } from 'cspell';
 import { lint } from 'cspell';
-import { findConfig } from './config';
+import { findOrCreateConfig } from './config';
 import {
 	reportErrors,
 	reportSuccess,
@@ -60,7 +60,7 @@ const globs = program.processedArgs[0];
 showStartupMessage(globs);
 
 const start = async () => {
-	const configPath = await findConfig(options.config);
+	const configPath = await findOrCreateConfig(options.config);
 	showConfigurationFilePath(configPath);
 
 	const {

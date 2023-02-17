@@ -12,7 +12,7 @@ export const writeToSettings = async (settings: CSpellSettings | { cspell: CSpel
 	await writeFile(configPath!, JSON.stringify(settings, null, 4));
 };
 
-export const findConfig = async (config?: string) => {
+export const findOrCreateConfig = async (config?: string) => {
 	// Try to locate a config file in the current working directory, or with the `config` option if it was provided.
 	const configSource = config ?? (await searchForConfig(process.cwd()))?.__importRef?.filename;
 
