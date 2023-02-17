@@ -61,18 +61,16 @@ describe.each(allTypoSets)('%s', (name, data) => {
 
 describe('findConfig', () => {
 	test('should find a mock config file in working directory', async () => {
-		const readFileSpy = vi.spyOn<typeof fs, 'readFile'>(fs, 'readFile');
+		const configPath = join(process.cwd(), 'cspell.json');
+
+		const readFileSpy = vi.spyOn(fs, 'readFile');
 
 		readFileSpy.mockImplementation(((path: string, _encoding: any, callback: (err: null, data: string) => void) => {
-			if (path === join(process.cwd(), 'cspell.json')) {
-				callback(null, '{}');
-			} else {
-				callback(null, '');
-			}
+			callback(null, path === configPath ? '{}' : '');
 		}) as typeof fs.readFile);
 
 		const config = await findOrCreateConfig();
 
-		expect(config).toBe(join(process.cwd(), 'cspell.json'));
+		expect(config).toBe(configPath);
 	});
 });
