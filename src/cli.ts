@@ -3,8 +3,16 @@ import { red } from 'colorette';
 import { program } from 'commander';
 import type { Issue } from 'cspell';
 import { lint } from 'cspell';
-import { findConfig } from './config';
-import { reportErrors, reportSuccess, resetDisplay, showProgress, showStartupMessage, stopSpinner } from './display';
+import { findOrCreateConfig } from './config';
+import {
+	reportErrors,
+	reportSuccess,
+	resetDisplay,
+	showConfigurationFilePath,
+	showProgress,
+	showStartupMessage,
+	stopSpinner
+} from './display';
 import { handleIssues } from './handleIssue';
 
 interface CLIOptions {
@@ -52,7 +60,8 @@ const globs = program.processedArgs[0];
 showStartupMessage(globs);
 
 const start = async () => {
-	const configPath = await findConfig(options.config);
+	const configPath = await findOrCreateConfig(options.config);
+	showConfigurationFilePath(configPath);
 
 	const {
 		issues: issueCount,
