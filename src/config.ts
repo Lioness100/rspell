@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import type { CSpellSettings } from 'cspell';
 import { searchForConfig } from 'cspell-lib';
+import findDefaultConfigPath from 'application-config-path';
 // eslint-disable-next-line import/no-relative-packages
 import { previousState } from './shared';
 
@@ -17,10 +18,10 @@ export const findOrCreateConfig = async (config?: string) => {
 	const configSource = config ?? (await searchForConfig(process.cwd()))?.__importRef?.filename;
 
 	// LocalConfigPath is a path to a config file in the user's configuration directory (platform dependent).
-	const localConfigPath = (await import('application-config-path')).default('cspell.json');
+	const defaultConfigPath = findDefaultConfigPath('cspell.json');
 
 	// If no config file was found, use/create a config file in the user's configuration directory (platform dependent).
-	const path = configSource ?? localConfigPath;
+	const path = configSource ?? defaultConfigPath;
 
 	// Only JSON files are supported to prevent more dependencies for yml parsing. If the config file is not a JSON
 	// file, it can still be used, but it won't be updated with new ignored words.
@@ -29,7 +30,7 @@ export const findOrCreateConfig = async (config?: string) => {
 	}
 
 	// If the path is the local config path and it doesn't exist, create it.
-	if (path === localConfigPath && !existsSync(localConfigPath)) {
+	if (path === defaultConfigPath && !existsSync(defaultConfigPath)) {
 		await writeToSettings({});
 	}
 
