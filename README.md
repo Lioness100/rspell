@@ -59,7 +59,8 @@ you and update the list of ignored words appropriately as you use the CLI.
 ## 💡 Featured PRs using `rspell`
 
 - [mui/material-ui#36194](https://github.com/mui/material-ui/pull/36194) (980 typos)
-- [botlabs-gg/yagpdb#1438](https://github.com/botlabs-gg/yagpdb) (910)
+- [botlabs-gg/yagpdb#1438](https://github.com/botlabs-gg/yagpdb) (910 typos)
+- [PowerShell/PowerShell#19175](https://github.com/PowerShell/PowerShell/pull/19175) (881 typos)
 - [Byron/gitoxide#724](https://github.com/Byron/gitoxide/pull/724) (408 typos)
 - [babel/babel#15432](https://github.com/babel/babel/pull/15432) (387 typos)
 - [ant-design/ant-design#40791](https://github.com/ant-design/ant-design/pull/40791) (157 typos)
@@ -82,4 +83,6 @@ you and update the list of ignored words appropriately as you use the CLI.
 - [vitejs/vite#12032](https://github.com/vitejs/vite/pull/12032) (8 typos)
 - [rust-lang-nursery/rust-cookbook#684](https://github.com/rust-lang-nursery/rust-cookbook/pull/684) (7 typos)
 - [arc53/DocsGPT#36](https://github.com/arc53/DocsGPT/pull/36) (5 typos)
+- [rust-secure-code/cargo-geiger#442](https://github.com/rust-secure-code/cargo-geiger/pull/442)
+  (4 typos)
 - [graphile/worker#316](https://github.com/graphile/worker/pull/316) (2 typos)
