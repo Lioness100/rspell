@@ -64,6 +64,7 @@ you and update the list of ignored words appropriately as you use the CLI.
 - [Byron/gitoxide#724](https://github.com/Byron/gitoxide/pull/724) (408 typos)
 - [babel/babel#15432](https://github.com/babel/babel/pull/15432) (387 typos)
 - [ant-design/ant-design#40791](https://github.com/ant-design/ant-design/pull/40791) (157 typos)
+- [meilisearch/meilisearch#3512](https://github.com/meilisearch/meilisearch/pull/3512) (111 typos)
 - [nextauthjs/next-auth#6701](https://github.com/nextauthjs/next-auth/pull/6701) (63 typos)
 - [nestjs/nest#11096](https://github.com/nestjs/nest/pull/11096) (56 typos)
 - [vitest-dev/vitest#2815](https://github.com/vitest-dev/vitest/pull/2815) (48 typos)
