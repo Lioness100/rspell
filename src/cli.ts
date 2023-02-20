@@ -1,8 +1,8 @@
 #!/usr/bin/env node
+
 import { red } from 'colorette';
 import { program } from 'commander';
-import type { Issue } from 'cspell';
-import { lint } from 'cspell';
+import { lint, type Issue } from 'cspell';
 import { findOrCreateConfig } from './config';
 import {
 	reportErrors,

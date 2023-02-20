@@ -72,6 +72,7 @@ you and update the list of ignored words appropriately as you use the CLI.
 - [prisma/prisma#17874](https://github.com/prisma/prisma/pull/17874) (43 typos)
 - [trpc/trpc#3735](https://github.com/trpc/trpc/pull/3735) (40 typos)
 - [reactjs/reactjs.org#5586](https://github.com/reactjs/reactjs.org/pull/5586) (35 typos)
+- [zloirock/core-js#1215](https://github.com/zloirock/core-js/pull/1215) (28 typos)
 - [nuxt/nuxt#18976](https://github.com/nuxt/nuxt/pull/18976) (26 typos)
 - [chakra-ui/chakra-ui#7340](https://github.com/chakra-ui/chakra-ui/pull/7340) (16 typos)
 - [nextjs/docs.nestjs.com#2622](https://github.com/nestjs/docs.nestjs.com/pull/2622) (14 typos)

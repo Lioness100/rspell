@@ -1,10 +1,8 @@
 import { extname } from 'node:path';
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
-import type { CSpellSettings } from 'cspell';
-import { searchForConfig } from 'cspell-lib';
+import { searchForConfig, type CSpellSettings } from 'cspell-lib';
 import findDefaultConfigPath from 'application-config-path';
-// eslint-disable-next-line import/no-relative-packages
 import { previousState } from './shared';
 
 let configPath: string | undefined;
