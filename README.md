@@ -63,6 +63,7 @@ you and update the list of ignored words appropriately as you use the CLI.
 - [PowerShell/PowerShell#19175](https://github.com/PowerShell/PowerShell/pull/19175) (881 typos)
 - [Byron/gitoxide#724](https://github.com/Byron/gitoxide/pull/724) (408 typos)
 - [babel/babel#15432](https://github.com/babel/babel/pull/15432) (387 typos)
+- [flutter/flutter#121171](https://github.com/flutter/flutter/pull/121171) (284 typos)
 - [ant-design/ant-design#40791](https://github.com/ant-design/ant-design/pull/40791) (157 typos)
 - [pubkey/rxdb#4463](https://github.com/pubkey/rxdb/pull/4463) (156 typos)
 - [meilisearch/meilisearch#3512](https://github.com/meilisearch/meilisearch/pull/3512) (111 typos)
