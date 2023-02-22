@@ -49,7 +49,6 @@ export const centerText = (text: string, length: number, width: number) => {
 };
 
 export const determineAction = async (
-	url: URL,
 	issue: Issue,
 	issues: Issue[],
 	totalIssueCount: number
@@ -57,15 +56,13 @@ export const determineAction = async (
 	const index = totalIssueCount - issues.length;
 	const progressIndicator = `${index}/${totalIssueCount} ── `;
 	const text = formatContext(issue);
-	const path = fileURLToPath(url);
+	const path = fileURLToPath(new URL(issue.uri!));
 	const trace = `:${issue.row}:${issue.col}`;
 
 	// Create a header that displays the absolute path to the file and the line and column of the typo. This header
 	// is centered in the terminal (the width of the terminal is stored in process.stdout.columns)
 
-	const typoLocation = bold(
-		greenBright(progressIndicator) + whiteBright(fileURLToPath(url)) + cyan(`:${issue.row}:${issue.col}`)
-	);
+	const typoLocation = bold(greenBright(progressIndicator) + whiteBright(path) + cyan(`:${issue.row}:${issue.col}`));
 
 	const width = process.stdout.columns;
 	const typoLocationHeader = centerText(typoLocation, path.length + trace.length + progressIndicator.length, width);

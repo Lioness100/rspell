@@ -34,7 +34,7 @@ afterEach(() => {
 });
 
 describe.each(allTypoSets)('%s', (name, data) => {
-	test('Fixing & Displaying Typos', async () => {
+	test('should accurately find and replace individual typos', async () => {
 		file = data.text;
 
 		const originalIssueLength = data.issues.length;
@@ -52,7 +52,7 @@ describe.each(allTypoSets)('%s', (name, data) => {
 
 		// We can't use the original data.issues, because the `offset` and `line.text` properties are updated. So, we
 		// have to use the mocked `determineAction` function to get the issues that were displayed.
-		const displayedIssues = vi.mocked(determineAction).mock.calls.map(([, issue]) => issue);
+		const displayedIssues = vi.mocked(determineAction).mock.calls.map(([issue]) => issue);
 		const contextDisplays = displayedIssues.map((issue) => formatContext(issue));
 
 		expect(contextDisplays, name).toMatchObject(data.displays);

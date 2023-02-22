@@ -8,13 +8,19 @@ import { addIgnoreWordToSettings, writeToSettings } from './config';
 
 let totalIssueCount = 0;
 
-export const writeChangeToFile = async (url: URL, issue: Issue, replacer: string) => {
-	const file = await readFile(url, 'utf8');
-
+export const updateFileText = (issue: Issue, replacer: string, file: string) => {
 	// `issue.offset` is the index of the first character of the issue. With this, we slice everything in the file
 	// before the text, then add the replacer, then add everything after the text.
-	const newFile = file.slice(0, issue.offset) + replacer + file.slice(issue.offset + issue.text.length);
-	await writeFile(url, newFile);
+	return file.slice(0, issue.offset) + replacer + file.slice(issue.offset + issue.text.length);
+};
+
+export const replaceSingleChange = async (issue: Issue, issues: Issue[], replacer: string) => {
+	previousState.resolvedIssues.push(issue);
+	updateFutureIssues(issue, replacer, issues);
+
+	const url = new URL(issue.uri!);
+	const file = await readFile(url, 'utf8');
+	await writeFile(url, updateFileText(issue, replacer, file));
 };
 
 // When we replace a word, we need to update the offset of all future typos in that file, because they would be
@@ -66,15 +72,11 @@ export const updateFutureIssues = (issue: Issue, replacer: string, issues: Issue
 	}
 };
 
-export const fixIssue = async (issues: Issue[], issue: Issue, replacer: string, url: URL) => {
-	previousState.resolvedIssues.push(issue);
-	updateFutureIssues(issue, replacer, issues);
-	await writeChangeToFile(url, issue, replacer).catch(() => null);
-};
+export const performSideEffects = async (issues: Issue[], issue: Issue, action: Action, replacer: string) => {
+	const filesToWrite = new Map<string, { file: string; url: URL }>();
+	const updatedIssues = [];
 
-export const performSideEffects = async (issues: Issue[], issue: Issue, action: Action, replacer: string, url: URL) => {
-	// The issues array is modified in place, so we need to make a copy of it.
-	for (const futureIssue of [...issues]) {
+	for (const [idx, futureIssue] of issues.entries()) {
 		if (
 			!futureIssue.uri ||
 			// If we're skipping the file, we only want to remove issues that share the same URI. Otherwise (action
@@ -83,22 +85,26 @@ export const performSideEffects = async (issues: Issue[], issue: Issue, action: 
 				? futureIssue.uri !== issue.uri
 				: futureIssue.text !== issue.text
 		) {
+			updatedIssues.push(futureIssue);
 			continue;
 		}
 
-		issues.splice(issues.indexOf(futureIssue), 1);
+		if (action === Action.ReplaceAll) {
+			const url = new URL(futureIssue.uri!);
+			const file = filesToWrite.get(futureIssue.uri!)?.file ?? (await readFile(url, 'utf8'));
+			filesToWrite.set(futureIssue.uri!, { file: updateFileText(futureIssue, replacer, file), url });
 
-		// If we're ignoring the issue, we don't need to do any more work.
-		if (action !== Action.ReplaceAll) {
-			continue;
+			previousState.resolvedIssues.push(futureIssue);
+			updateFutureIssues(futureIssue, replacer, issues.slice(idx + 1));
 		}
-
-		// Otherwise, we update the offsets of future issues and write the change to file, just as we would if it
-		// was a normal Replace action.
-		// TODO: If multiple of these issues are in the same file, we should store the file contents in memory and
-		// only write it once at the end.
-		await fixIssue(issues, futureIssue, replacer, futureIssue.uri === issue.uri ? url : new URL(futureIssue.uri!));
 	}
+
+	// `issues.splice(0, issues.length, ...)` is used to replace the entire array in place. This is faster than calling
+	// issues.splice individually, especially when there are many issues.
+	issues.splice(0, issues.length, ...updatedIssues);
+
+	// Only write to a file once, instead of once per issue.
+	await Promise.allSettled([...filesToWrite.values()].map(({ url, file }) => writeFile(url, file)));
 };
 
 export const restoreState = async (issues: Issue[]) => {
@@ -109,12 +115,21 @@ export const restoreState = async (issues: Issue[]) => {
 	}
 
 	if (replacer) {
-		for (const resolvedIssue of resolvedIssues) {
-			// Replace the new replacer with the old text instead of the other way around.
-			const newReplacer = resolvedIssue.text;
-			resolvedIssue.text = replacer;
-			await writeChangeToFile(new URL(resolvedIssue.uri!), resolvedIssue, newReplacer).catch(() => null);
+		// Abridged version of performSideEffects, but without updating future issues, because we're restoring the state
+		// right after this.
+		const filesToWrite = new Map<string, { file: string; url: URL }>();
+		for (const resolvedIssue of resolvedIssues.reverse()) {
+			const url = new URL(resolvedIssue.uri!);
+			const file = filesToWrite.get(resolvedIssue.uri!)?.file ?? (await readFile(url, 'utf8'));
+
+			// The issue text is now the replacer and it should be replaced with the original text to effectively revert
+			// the change.
+			const newFile = updateFileText({ ...resolvedIssue, text: replacer }, resolvedIssue.text, file);
+
+			filesToWrite.set(resolvedIssue.uri!, { file: newFile, url });
 		}
+
+		await Promise.allSettled([...filesToWrite.values()].map(({ url, file }) => writeFile(url, file)));
 	}
 
 	// Edit the entire issues array in place, so that the reference is the same.
@@ -127,8 +142,7 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 		return;
 	}
 
-	const url = new URL(issue.uri);
-	const [action, replacer] = await determineAction(url, issue, issues, totalIssueCount);
+	const [action, replacer] = await determineAction(issue, issues, totalIssueCount);
 
 	previousState.action = action;
 
@@ -155,13 +169,18 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 		config: undefined
 	} as Omit<typeof previousState, 'action'>);
 
-	if (action === Action.Replace || action === Action.ReplaceAll) {
-		await fixIssue(issues, issue, replacer, url);
-	}
+	if (action === Action.Replace) {
+		await replaceSingleChange(issue, issues, replacer).catch(() => null);
+	} else if (action === Action.ReplaceAll || action === Action.IgnoreAll || action === Action.SkipFile) {
+		// The above actions all have side effects (as in, they require modification of future issues).
 
-	// The following actions all have side effects (as in, they require modification of future issues).
-	if (action === Action.ReplaceAll || action === Action.IgnoreAll || action === Action.SkipFile) {
-		await performSideEffects(issues, issue, action, replacer, url);
+		// Add the current issue back to the list of issues so it can be used in the performSideEffects loop to prevent
+		// duplicated code. It will be removed from the list in the loop.
+		if (action === Action.ReplaceAll) {
+			issues.unshift(issue);
+		}
+
+		await performSideEffects(issues, issue, action, replacer);
 
 		if (action === Action.IgnoreAll) {
 			await addIgnoreWordToSettings(issue.text).catch(() => null);
