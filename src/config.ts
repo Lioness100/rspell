@@ -2,7 +2,6 @@ import { extname } from 'node:path';
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { searchForConfig, type CSpellSettings } from 'cspell-lib';
-import findDefaultConfigPath from 'application-config-path';
 import { previousState } from './shared';
 
 let configPath: string | undefined;
@@ -16,7 +15,7 @@ export const findOrCreateConfig = async (config?: string) => {
 	const configSource = config ?? (await searchForConfig(process.cwd()))?.__importRef?.filename;
 
 	// If no config file was found, use/create a config file in the user's configuration directory (platform dependent).
-	const path = configSource ?? findDefaultConfigPath('cspell.json');
+	const path = configSource ?? (await import('application-config-path')).default('cspell.json');
 
 	// Only JSON files are supported to prevent more dependencies for yml parsing. If the config file is not a JSON
 	// file, it can still be used, but it won't be updated with new ignored words.
