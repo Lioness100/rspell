@@ -13,10 +13,12 @@ import {
 	underline,
 	whiteBright,
 	yellow,
-	yellowBright
+	yellowBright,
+	magentaBright
 } from 'colorette';
 import { type Spinner, createSpinner } from 'nanospinner';
-import { Action, previousState } from './shared';
+import { Action, type HistoryIssue, previousState } from './shared';
+import { history } from './history';
 
 registerPrompt('suggest', inquirerSuggestionPlugin);
 
@@ -89,7 +91,13 @@ export const determineAction = async (
 			{ name: `Skip File (${cyan(otherTyposInFileCount + 1)})`, value: Action.SkipFile },
 			// The explicit undefined check is needed because Action.Ignore is 0, which is falsy.
 			...(previousState.action !== undefined && previousState.action !== Action.UndoLastAction
-				? [{ name: yellowBright('Undo Last Action'), value: Action.UndoLastAction }]
+				? [
+						{ name: yellowBright('Undo Last Action'), value: Action.UndoLastAction },
+						{
+							name: magentaBright('Open Issue History'),
+							value: Action.OpenHistory
+						}
+				  ]
 				: []),
 			{ name: red('Quit'), value: Action.Quit }
 		]
@@ -117,6 +125,60 @@ export const determineAction = async (
 	}
 
 	return [action, replacer];
+};
+
+export const determineHistoryIssue = async () => {
+	const { issue } = await prompt<{ issue: HistoryIssue | Action.Quit }>({
+		type: 'list',
+		name: 'issue',
+		message: 'Choose a issue to go back:',
+		choices: [
+			{ name: red('Quit'), value: Action.Quit },
+			...history.map((entry) => {
+				let name: string;
+
+				const uri = fileURLToPath(new URL(entry.issue.uri!));
+
+				switch (entry.action) {
+					case Action.Ignore: {
+						name = `❕ Ignored ${cyan(entry.issue.text)} in ${cyan(uri)}:${cyan(entry.issue.row)}:${cyan(
+							entry.issue.col
+						)}`;
+						break;
+					}
+					case Action.Replace: {
+						name = `✏ Replaced ${cyan(entry.original!)} with ${cyan(entry.replacer!)} in ${cyan(
+							uri
+						)}:${cyan(entry.issue.row)}:${cyan(entry.issue.col)}`;
+
+						break;
+					}
+					case Action.IgnoreAll: {
+						name = `❕ Ignored all occurrences of ${cyan(entry.issue.text)} in ${cyan(uri)}:${cyan(
+							entry.issue.row
+						)}:${cyan(entry.issue.col)}`;
+						break;
+					}
+					case Action.ReplaceAll: {
+						name = `✏ Replaced all occurrences of ${cyan(entry.original!)} with ${cyan(
+							entry.replacer!
+						)} in ${cyan(uri)}:${cyan(entry.issue.row)}:${cyan(entry.issue.col)}`;
+						break;
+					}
+					default: {
+						name = 'Unknown action';
+					}
+				}
+
+				return {
+					name,
+					value: entry
+				};
+			})
+		]
+	});
+
+	return issue;
 };
 
 // This function is used to clear the current terminal screen. This is used before displaying a new typo for more
