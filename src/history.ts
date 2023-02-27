@@ -1,8 +1,8 @@
-import { type HistoryIssue } from './shared';
+import { type PastIssue } from './shared';
 
-export const history: HistoryIssue[] = [];
+export const history: PastIssue[] = [];
 
-export const addNewHistoryIssue = ({ action, issue, replacer }: Omit<HistoryIssue, 'id'>) => {
+export const addNewPastIssue = ({ action, issue, replacer }: Omit<PastIssue, 'id'>) => {
 	if (history.length >= 10) {
 		history.shift();
 	}
@@ -27,7 +27,7 @@ export const addNewHistoryIssue = ({ action, issue, replacer }: Omit<HistoryIssu
 	history.push({ action, issue, original, replacer });
 };
 
-export const removeIssueFromHistory = (issue: HistoryIssue) => {
+export const removeIssueFromHistory = (issue: PastIssue) => {
 	const index = history.indexOf(issue);
 
 	if (index !== -1) {

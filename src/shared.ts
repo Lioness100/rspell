@@ -12,7 +12,7 @@ export const enum Action {
 	UndoLastAction
 }
 
-export interface HistoryIssue {
+export interface PastIssue {
 	action: Action;
 	issue: Issue;
 	original?: string;

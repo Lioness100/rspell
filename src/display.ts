@@ -17,7 +17,7 @@ import {
 	magentaBright
 } from 'colorette';
 import { type Spinner, createSpinner } from 'nanospinner';
-import { Action, previousState, type HistoryIssue } from './shared';
+import { Action, previousState, type PastIssue } from './shared';
 import { history } from './history';
 
 registerPrompt('suggest', inquirerSuggestionPlugin);
@@ -128,8 +128,8 @@ export const determineAction = async (
 	return [action, replacer];
 };
 
-export const determineHistoryIssue = async () => {
-	const { issue } = await prompt<{ issue?: HistoryIssue }>({
+export const determinePastIssue = async () => {
+	const { issue } = await prompt<{ issue?: PastIssue }>({
 		type: 'list',
 		name: 'issue',
 		message: 'Choose an action to go back to',
