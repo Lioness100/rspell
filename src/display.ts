@@ -137,7 +137,7 @@ export const determineHistoryIssue = async () => {
 	const { issue } = await prompt<{ issue: HistoryIssue | Action.Quit }>({
 		type: 'list',
 		name: 'issue',
-		message: 'Choose a issue to go back:',
+		message: 'Choose an action to go back to',
 		choices: [
 			{ name: red('Quit'), value: Action.Quit },
 			...history.map((entry) => {
