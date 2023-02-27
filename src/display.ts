@@ -98,12 +98,7 @@ export const determineAction = async (
 				? [{ name: yellowBright('Undo Last Action'), value: Action.UndoLastAction }]
 				: []),
 			...(shouldDisplayOpenHistory
-				? [
-						{
-							name: magentaBright('Open Action History'),
-							value: Action.OpenHistory
-						}
-				  ]
+				? [{ name: magentaBright('Open Action History'), value: Action.OpenHistory }]
 				: []),
 			{ name: red('Quit'), value: Action.Quit }
 		]
