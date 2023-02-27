@@ -164,13 +164,14 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 	if (action === Action.OpenHistory) {
 		resetDisplay();
 
+		// DeterminedAction can be either an issue or an Action.Quit.
 		const determinedAction = await determineHistoryIssue();
 
 		if (determinedAction === Action.Quit) {
 			return true;
 		}
 
-		const { issue, id } = determinedAction;
+		const { issue } = determinedAction;
 
 		const hasQuit = await handleIssue(issues, issue);
 
@@ -178,7 +179,7 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 			return true;
 		}
 
-		removeIssueFromHistory(id);
+		removeIssueFromHistory(determinedAction);
 
 		return handleIssues(issues);
 	}

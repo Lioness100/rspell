@@ -14,7 +14,6 @@ export const enum Action {
 
 export interface HistoryIssue {
 	action: Action;
-	id: string;
 	issue: Issue;
 	original?: string;
 	replacer?: string;

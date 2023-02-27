@@ -1,14 +1,13 @@
-import { randomUUID } from 'node:crypto';
 import { type HistoryIssue } from './shared';
 
-export const history = new Array<HistoryIssue>();
+export const history: HistoryIssue[] = [];
 
 export const addNewHistoryIssue = ({ action, issue, replacer }: Omit<HistoryIssue, 'id'>) => {
-	if (history.length >= 100) {
+	if (history.length >= 10) {
 		history.shift();
 	}
 
-	let original: string;
+	const original: string = issue.text;
 
 	//  If action is Replace or ReplaceAll, the word should be replaced with the replacer
 	// on the issue object, because when the user rolls back the action and write a replacement
@@ -19,8 +18,6 @@ export const addNewHistoryIssue = ({ action, issue, replacer }: Omit<HistoryIssu
 			return;
 		}
 
-		original = issue.text;
-
 		issue.line.text = issue.line.text.replace(issue.text, replacer);
 
 		issue.text = replacer;
@@ -30,16 +27,15 @@ export const addNewHistoryIssue = ({ action, issue, replacer }: Omit<HistoryIssu
 	history.push({
 		action,
 		issue,
-		original: original!,
-		replacer,
-		id: randomUUID()
+		original,
+		replacer
 	});
 };
 
-export const removeIssueFromHistory = (id: string) => {
-	const index = history.findIndex((issue) => issue.id === id);
+export const removeIssueFromHistory = (issue: HistoryIssue) => {
+	const index = history.indexOf(issue);
 
-	if (index !== -1) {
+	if (index >= 0) {
 		history.splice(index, 1);
 	}
 };
