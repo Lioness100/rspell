@@ -129,48 +129,48 @@ export const determineAction = async (
 };
 
 export const determineHistoryIssue = async () => {
-	const { issue } = await prompt<{ issue: HistoryIssue | Action.Quit }>({
+	const { issue } = await prompt<{ issue?: HistoryIssue }>({
 		type: 'list',
 		name: 'issue',
 		message: 'Choose an action to go back to',
 		choices: [
-			{ name: red('Quit'), value: Action.Quit },
+			{ name: red('Quit'), value: undefined },
 			...history.map((entry) => {
 				const uri = fileURLToPath(new URL(entry.issue.uri!));
 
+				let prompt: string;
+
 				switch (entry.action) {
 					case Action.Ignore: {
-						name = `❕ Ignored ${cyan(entry.issue.text)} in ${cyan(uri)}:${cyan(entry.issue.row)}:${cyan(
+						prompt = `❕ Ignored ${cyan(entry.issue.text)} in ${cyan(uri)}:${cyan(entry.issue.row)}:${cyan(
 							entry.issue.col
 						)}`;
 						break;
 					}
 					case Action.Replace: {
-						name = `✏ Replaced ${cyan(entry.original!)} with ${cyan(entry.replacer!)} in ${cyan(
+						prompt = `✏ Replaced ${cyan(entry.original!)} with ${cyan(entry.replacer!)} in ${cyan(
 							uri
 						)}:${cyan(entry.issue.row)}:${cyan(entry.issue.col)}`;
 
 						break;
 					}
 					case Action.IgnoreAll: {
-						name = `❕ Ignored all occurrences of ${cyan(entry.issue.text)} in ${cyan(uri)}:${cyan(
+						prompt = `❕ Ignored all occurrences of ${cyan(entry.issue.text)} in ${cyan(uri)}:${cyan(
 							entry.issue.row
 						)}:${cyan(entry.issue.col)}`;
 						break;
 					}
 					case Action.ReplaceAll: {
-						name = `✏ Replaced all occurrences of ${cyan(entry.original!)} with ${cyan(
-							entry.replacer!
-						)} in ${cyan(uri)}:${cyan(entry.issue.row)}:${cyan(entry.issue.col)}`;
+						prompt = `✏ Replaced all occurrences of ${cyan(entry.original!)} with ${cyan(entry.replacer!)}`;
 						break;
 					}
 					default: {
-						name = 'Unknown action';
+						prompt = 'Unknown action';
 					}
 				}
 
 				return {
-					name,
+					name: `${prompt} in ${cyan(uri)}:${cyan(entry.issue.row)}:${cyan(entry.issue.col)}`,
 					value: entry
 				};
 			})
