@@ -211,11 +211,7 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 		}
 	}
 
-	addNewHistoryIssue({
-		action,
-		issue,
-		replacer
-	});
+	addNewHistoryIssue({ action, issue, replacer });
 
 	resetDisplay();
 

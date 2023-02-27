@@ -7,7 +7,7 @@ export const addNewHistoryIssue = ({ action, issue, replacer }: Omit<HistoryIssu
 		history.shift();
 	}
 
-	const original: string = issue.text;
+	const original = issue.text;
 
 	//  If action is Replace or ReplaceAll, the word should be replaced with the replacer
 	// on the issue object, because when the user rolls back the action and write a replacement
@@ -24,18 +24,13 @@ export const addNewHistoryIssue = ({ action, issue, replacer }: Omit<HistoryIssu
 		issue.length = replacer.length;
 	}
 
-	history.push({
-		action,
-		issue,
-		original,
-		replacer
-	});
+	history.push({ action, issue, original, replacer });
 };
 
 export const removeIssueFromHistory = (issue: HistoryIssue) => {
 	const index = history.indexOf(issue);
 
-	if (index >= 0) {
+	if (index !== -1) {
 		history.splice(index, 1);
 	}
 };

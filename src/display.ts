@@ -17,7 +17,7 @@ import {
 	magentaBright
 } from 'colorette';
 import { type Spinner, createSpinner } from 'nanospinner';
-import { Action, type HistoryIssue, previousState } from './shared';
+import { Action, previousState, type HistoryIssue } from './shared';
 import { history } from './history';
 
 registerPrompt('suggest', inquirerSuggestionPlugin);
@@ -136,8 +136,6 @@ export const determineHistoryIssue = async () => {
 		choices: [
 			{ name: red('Quit'), value: Action.Quit },
 			...history.map((entry) => {
-				let name: string;
-
 				const uri = fileURLToPath(new URL(entry.issue.uri!));
 
 				switch (entry.action) {
