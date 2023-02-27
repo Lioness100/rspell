@@ -2,14 +2,14 @@ import type { CSpellSettings, Issue } from 'cspell';
 
 // This file is created to prevent circular dependencies
 export const enum Action {
-	Ignore = 'ignore',
-	IgnoreAll = 'ignore-all',
-	OpenHistory = 'open-history',
-	Quit = 'quit',
-	Replace = 'replace',
-	ReplaceAll = 'replace-all',
-	SkipFile = 'skip-file',
-	UndoLastAction = 'undo-last-action'
+	Ignore,
+	IgnoreAll,
+	OpenHistory,
+	Quit,
+	Replace,
+	ReplaceAll,
+	SkipFile,
+	UndoLastAction
 }
 
 export interface HistoryIssue {

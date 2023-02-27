@@ -79,6 +79,11 @@ export const determineAction = async (
 	const otherTypoInstancesCount = issues.filter((otherIssue) => otherIssue.text === issue.text).length;
 	const otherTyposInFileCount = issues.filter((otherIssue) => otherIssue.uri === issue.uri).length;
 
+	// The explicit undefined check is needed because Action.Ignore is 0, which is falsy.
+	const shouldDisplayUndoLastAction =
+		previousState.action !== undefined && previousState.action !== Action.UndoLastAction;
+	const shouldDisplayOpenHistory = previousState.action !== undefined && history.length > 0;
+
 	const { action } = await prompt<{ action: Action }>({
 		type: 'list',
 		name: 'action',
@@ -89,12 +94,13 @@ export const determineAction = async (
 			{ name: `Ignore All Occurrences (${cyan(otherTypoInstancesCount + 1)})`, value: Action.IgnoreAll },
 			{ name: `Replace All Occurrences (${cyan(otherTypoInstancesCount + 1)})`, value: Action.ReplaceAll },
 			{ name: `Skip File (${cyan(otherTyposInFileCount + 1)})`, value: Action.SkipFile },
-			// The explicit undefined check is needed because Action.Ignore is 0, which is falsy.
-			...(previousState.action !== undefined && previousState.action !== Action.UndoLastAction
+			...(shouldDisplayUndoLastAction
+				? [{ name: yellowBright('Undo Last Action'), value: Action.UndoLastAction }]
+				: []),
+			...(shouldDisplayOpenHistory
 				? [
-						{ name: yellowBright('Undo Last Action'), value: Action.UndoLastAction },
 						{
-							name: magentaBright('Open Issue History'),
+							name: magentaBright('Open Action History'),
 							value: Action.OpenHistory
 						}
 				  ]
