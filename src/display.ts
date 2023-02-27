@@ -121,7 +121,7 @@ export const determineAction = async (
 		}
 	]);
 
-	if (!replacer) {
+	if (!replacer || replacer === issue.text) {
 		return [Action.Ignore, ''];
 	}
 
@@ -138,39 +138,17 @@ export const determineHistoryIssue = async () => {
 			...history.map((entry) => {
 				const uri = fileURLToPath(new URL(entry.issue.uri!));
 
-				let prompt: string;
-
-				switch (entry.action) {
-					case Action.Ignore: {
-						prompt = `❕ Ignored ${cyan(entry.issue.text)} in ${cyan(uri)}:${cyan(entry.issue.row)}:${cyan(
-							entry.issue.col
-						)}`;
-						break;
-					}
-					case Action.Replace: {
-						prompt = `✏ Replaced ${cyan(entry.original!)} with ${cyan(entry.replacer!)} in ${cyan(
-							uri
-						)}:${cyan(entry.issue.row)}:${cyan(entry.issue.col)}`;
-
-						break;
-					}
-					case Action.IgnoreAll: {
-						prompt = `❕ Ignored all occurrences of ${cyan(entry.issue.text)} in ${cyan(uri)}:${cyan(
-							entry.issue.row
-						)}:${cyan(entry.issue.col)}`;
-						break;
-					}
-					case Action.ReplaceAll: {
-						prompt = `✏ Replaced all occurrences of ${cyan(entry.original!)} with ${cyan(entry.replacer!)}`;
-						break;
-					}
-					default: {
-						prompt = 'Unknown action';
-					}
-				}
+				const actionDisplays: Partial<Record<Action, string>> = {
+					[Action.Ignore]: `❕ Ignored ${cyan(entry.issue.text)}`,
+					[Action.Replace]: `✏ Replaced ${cyan(entry.original!)} with ${cyan(entry.replacer!)}`,
+					[Action.IgnoreAll]: `❕ Ignored all occurrences of ${cyan(entry.issue.text)}`,
+					[Action.ReplaceAll]: `✏ Replaced all occurrences of ${cyan(entry.original!)}`
+				};
 
 				return {
-					name: `${prompt} in ${cyan(uri)}:${cyan(entry.issue.row)}:${cyan(entry.issue.col)}`,
+					name: `${actionDisplays[entry.action] ?? 'Unknown action'} in ${cyan(uri)}:${cyan(
+						entry.issue.row
+					)}:${cyan(entry.issue.col)}`,
 					value: entry
 				};
 			})
