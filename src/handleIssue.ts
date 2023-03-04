@@ -2,10 +2,10 @@
 /* eslint-disable unicorn/no-useless-spread */
 import { readFile, writeFile } from 'node:fs/promises';
 import type { Issue } from 'cspell';
-import { determineAction, determinePastIssue, resetDisplay } from './display';
+import { determineAction, pickIssueFromHistory, resetDisplay } from './display';
 import { Action, previousState } from './shared';
 import { addIgnoreWordToSettings, writeToSettings } from './config';
-import { addNewPastIssue, removeIssueFromHistory } from './history';
+import { appendIssueToHistory, removeIssueFromHistory } from './history';
 
 let totalIssueCount = 0;
 
@@ -164,7 +164,7 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 	if (action === Action.OpenHistory) {
 		resetDisplay();
 
-		const determinedIssue = await determinePastIssue();
+		const determinedIssue = await pickIssueFromHistory();
 
 		if (!determinedIssue) {
 			return true;
@@ -210,7 +210,7 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 		}
 	}
 
-	addNewPastIssue({ action, issue, replacer });
+	appendIssueToHistory({ action, issue, replacer });
 
 	resetDisplay();
 

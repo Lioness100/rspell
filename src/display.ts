@@ -17,7 +17,7 @@ import {
 	magentaBright
 } from 'colorette';
 import { type Spinner, createSpinner } from 'nanospinner';
-import { Action, previousState, type PastIssue } from './shared';
+import { Action, previousState, type ActionHistoryEntry } from './shared';
 import { history } from './history';
 
 registerPrompt('suggest', inquirerSuggestionPlugin);
@@ -128,27 +128,32 @@ export const determineAction = async (
 	return [action, replacer];
 };
 
-export const determinePastIssue = async () => {
-	const { issue } = await prompt<{ issue?: PastIssue }>({
+export const pickIssueFromHistory = async () => {
+	const { issue } = await prompt<{ issue?: ActionHistoryEntry }>({
 		type: 'list',
 		name: 'issue',
 		message: 'Choose an action to go back to',
 		choices: [
 			{ name: red('Quit'), value: undefined },
 			...history.map((entry) => {
-				const uri = fileURLToPath(new URL(entry.issue.uri!));
+				const { original, replacer, issue } = entry;
+				const { text, row, col, uri: issueUri } = issue;
+
+				const uri = fileURLToPath(new URL(issueUri!));
+
+				const path = `${cyan(uri)}:${cyan(row)}:${cyan(col)}`;
 
 				const actionDisplays: Partial<Record<Action, string>> = {
-					[Action.Ignore]: `❕ Ignored ${cyan(entry.issue.text)}`,
-					[Action.Replace]: `✏ Replaced ${cyan(entry.original!)} with ${cyan(entry.replacer!)}`,
-					[Action.IgnoreAll]: `❕ Ignored all occurrences of ${cyan(entry.issue.text)}`,
-					[Action.ReplaceAll]: `✏ Replaced all occurrences of ${cyan(entry.original!)}`
+					[Action.Ignore]: `❕ Ignored ${cyan(text)}`,
+					[Action.Replace]: `✏ Replaced ${cyan(original!)} with ${cyan(replacer!)}`,
+					[Action.IgnoreAll]: `❕ Ignored all occurrences of ${cyan(text)}`,
+					[Action.ReplaceAll]: `✏ Replaced all occurrences of ${cyan(original!)} with ${cyan(replacer!)}`
 				};
 
+				const action = actionDisplays[entry.action] ?? 'Unknown action';
+
 				return {
-					name: `${actionDisplays[entry.action] ?? 'Unknown action'} in ${cyan(uri)}:${cyan(
-						entry.issue.row
-					)}:${cyan(entry.issue.col)}`,
+					name: `${action} in ${path}`,
 					value: entry
 				};
 			})
