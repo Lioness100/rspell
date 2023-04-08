@@ -63,6 +63,7 @@ you and update the list of ignored words appropriately as you use the CLI.
 - [PowerShell/PowerShell#19175](https://github.com/PowerShell/PowerShell/pull/19175) (881 typos)
 - [BabylonJS/Babylon.js/13571](https://github.com/BabylonJS/Babylon.js/pull/13571) (639 typos)
 - [strapi/strapi#15903](https://github.com/strapi/strapi/pull/15903) (483 typos)
+- [twitter/the-algorithm#1736](https://github.com/twitter/the-algorithm/pull/1736) (437 typos)
 - [Byron/gitoxide#724](https://github.com/Byron/gitoxide/pull/724) (408 typos)
 - [babel/babel#15432](https://github.com/babel/babel/pull/15432) (387 typos)
 - [flutter/flutter#121171](https://github.com/flutter/flutter/pull/121171) (284 typos)
