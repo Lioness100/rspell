@@ -13,10 +13,12 @@ import {
 	underline,
 	whiteBright,
 	yellow,
-	yellowBright
+	yellowBright,
+	magentaBright
 } from 'colorette';
 import { type Spinner, createSpinner } from 'nanospinner';
-import { Action, previousState } from './shared';
+import { Action, previousState, type ActionHistoryEntry } from './shared';
+import { history } from './history';
 
 registerPrompt('suggest', inquirerSuggestionPlugin);
 
@@ -77,6 +79,11 @@ export const determineAction = async (
 	const otherTypoInstancesCount = issues.filter((otherIssue) => otherIssue.text === issue.text).length;
 	const otherTyposInFileCount = issues.filter((otherIssue) => otherIssue.uri === issue.uri).length;
 
+	// The explicit undefined check is needed because Action.Ignore is 0, which is falsy.
+	const shouldDisplayUndoLastAction =
+		previousState.action !== undefined && previousState.action !== Action.UndoLastAction;
+	const shouldDisplayOpenHistory = previousState.action !== undefined && history.length > 0;
+
 	const { action } = await prompt<{ action: Action }>({
 		type: 'list',
 		name: 'action',
@@ -87,9 +94,11 @@ export const determineAction = async (
 			{ name: `Ignore All Occurrences (${cyan(otherTypoInstancesCount + 1)})`, value: Action.IgnoreAll },
 			{ name: `Replace All Occurrences (${cyan(otherTypoInstancesCount + 1)})`, value: Action.ReplaceAll },
 			{ name: `Skip File (${cyan(otherTyposInFileCount + 1)})`, value: Action.SkipFile },
-			// The explicit undefined check is needed because Action.Ignore is 0, which is falsy.
-			...(previousState.action !== undefined && previousState.action !== Action.UndoLastAction
+			...(shouldDisplayUndoLastAction
 				? [{ name: yellowBright('Undo Last Action'), value: Action.UndoLastAction }]
+				: []),
+			...(shouldDisplayOpenHistory
+				? [{ name: magentaBright('Open Action History'), value: Action.OpenHistory }]
 				: []),
 			{ name: red('Quit'), value: Action.Quit }
 		]
@@ -112,11 +121,46 @@ export const determineAction = async (
 		}
 	]);
 
-	if (!replacer) {
+	if (!replacer || replacer === issue.text) {
 		return [Action.Ignore, ''];
 	}
 
 	return [action, replacer];
+};
+
+export const pickIssueFromHistory = async () => {
+	const { issue } = await prompt<{ issue?: ActionHistoryEntry }>({
+		type: 'list',
+		name: 'issue',
+		message: 'Choose an action to go back to',
+		choices: [
+			{ name: red('Quit'), value: undefined },
+			...history.map((entry) => {
+				const { original, replacer, issue } = entry;
+				const { text, row, col, uri: issueUri } = issue;
+
+				const uri = fileURLToPath(new URL(issueUri!));
+
+				const path = `${cyan(uri)}:${cyan(row)}:${cyan(col)}`;
+
+				const actionDisplays: Partial<Record<Action, string>> = {
+					[Action.Ignore]: `❕ Ignored ${cyan(text)}`,
+					[Action.Replace]: `✏ Replaced ${cyan(original!)} with ${cyan(replacer!)}`,
+					[Action.IgnoreAll]: `❕ Ignored all occurrences of ${cyan(text)}`,
+					[Action.ReplaceAll]: `✏ Replaced all occurrences of ${cyan(original!)} with ${cyan(replacer!)}`
+				};
+
+				const action = actionDisplays[entry.action] ?? 'Unknown action';
+
+				return {
+					name: `${action} in ${path}`,
+					value: entry
+				};
+			})
+		]
+	});
+
+	return issue;
 };
 
 // This function is used to clear the current terminal screen. This is used before displaying a new typo for more

@@ -4,11 +4,19 @@ import type { CSpellSettings, Issue } from 'cspell';
 export const enum Action {
 	Ignore,
 	IgnoreAll,
+	OpenHistory,
+	Quit,
 	Replace,
 	ReplaceAll,
 	SkipFile,
-	UndoLastAction,
-	Quit
+	UndoLastAction
+}
+
+export interface ActionHistoryEntry {
+	action: Action;
+	issue: Issue;
+	original?: string;
+	replacer?: string;
 }
 
 // Store everything's state so it can be restored if the user presses Action.UndoLastAction.

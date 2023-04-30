@@ -2,9 +2,10 @@
 /* eslint-disable unicorn/no-useless-spread */
 import { readFile, writeFile } from 'node:fs/promises';
 import type { Issue } from 'cspell';
-import { determineAction, resetDisplay } from './display';
+import { determineAction, pickIssueFromHistory, resetDisplay } from './display';
 import { Action, previousState } from './shared';
 import { addIgnoreWordToSettings, writeToSettings } from './config';
+import { appendIssueToHistory, removeIssueFromHistory } from './history';
 
 let totalIssueCount = 0;
 
@@ -160,6 +161,28 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 		return handleIssues(issues);
 	}
 
+	if (action === Action.OpenHistory) {
+		resetDisplay();
+
+		const determinedIssue = await pickIssueFromHistory();
+
+		if (!determinedIssue) {
+			return true;
+		}
+
+		const { issue } = determinedIssue;
+
+		const hasQuit = await handleIssue(issues, issue);
+
+		if (hasQuit) {
+			return true;
+		}
+
+		removeIssueFromHistory(determinedIssue);
+
+		return handleIssues(issues);
+	}
+
 	// Set the initial state
 	Object.assign(previousState, {
 		replacer,
@@ -187,7 +210,10 @@ export const handleIssue = async (issues: Issue[], issue: Issue) => {
 		}
 	}
 
+	appendIssueToHistory({ action, issue, replacer });
+
 	resetDisplay();
+
 	return action === Action.Quit;
 };
 
